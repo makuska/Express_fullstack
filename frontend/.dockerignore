@@ -1,0 +1,6 @@
+// .dockerignore
+
+reactapp/node_modules
+node_modules
+
+Dockerfile
