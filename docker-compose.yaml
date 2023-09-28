@@ -1,40 +1,39 @@
 # docker compose version which is currently 3.8
 version: "3.8"
 
-# Inspirat de aici: https://medium.com/@Anas.shahwan/dockerizing-nodejs-react-js-and-mongodb-apps-be67a73c7a7b#id_token=eyJhbGciOiJSUzI1NiIsImtpZCI6IjU5NjJlN2EwNTljN2Y1YzBjMGQ1NmNiYWQ1MWZlNjRjZWVjYTY3YzYiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL2FjY291bnRzLmdvb2dsZS5jb20iLCJuYmYiOjE2NzYyOTE3NTksImF1ZCI6IjIxNjI5NjAzNTgzNC1rMWs2cWUwNjBzMnRwMmEyamFtNGxqZGNtczAwc3R0Zy5hcHBzLmdvb2dsZXVzZXJjb250ZW50LmNvbSIsInN1YiI6IjEwMjY4OTM4ODYwMTk0MzM1NDQyNCIsImhkIjoiaXJpc29mdC5jb20ucm8iLCJlbWFpbCI6InN0ZWZhbkBpcmlzb2Z0LmNvbS5ybyIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJhenAiOiIyMTYyOTYwMzU4MzQtazFrNnFlMDYwczJ0cDJhMmphbTRsamRjbXMwMHN0dGcuYXBwcy5nb29nbGV1c2VyY29udGVudC5jb20iLCJuYW1lIjoiyJh0ZWZhbiBWw65sY2Vsb2l1IiwicGljdHVyZSI6Imh0dHBzOi8vbGgzLmdvb2dsZXVzZXJjb250ZW50LmNvbS9hL0FFZEZUcDZTTUxFMURQU3c2TUZnZHVQRmx3c2tXQk8yVnB0SlFNM281QVBaSHc9czk2LWMiLCJnaXZlbl9uYW1lIjoiyJh0ZWZhbiIsImZhbWlseV9uYW1lIjoiVsOubGNlbG9pdSIsImlhdCI6MTY3NjI5MjA1OSwiZXhwIjoxNjc2Mjk1NjU5LCJqdGkiOiJjOGU0MzJlOTA1OGI5YmM3MzdkNmM1ZmNhNDFlMDRhM2VlMGYyNDM0In0.Do6Y1gMdaYf148s_F4CsC15lOtyJyPf_M0iV8ww-kvx-2ZUH3CutTBVMT4mgtT5NC9eSvj2JH8Ss3UDKYAWKMSbp1G-_ytGL7ORn5LybPSRcEbQcnl3ykkfh0Za40mUOhz9uZRe5SmDAVRX9ev8JOjmtZENzeRnLVlRSexCM3wuBjPZoiqMY8ilwzbAlxi3O-T5WlX4aWo2hciyVvE7M5O8ddwtHyWA2XD_YrikS7HLGbFtuRezy3XVSiDd9kle2PUQTnMdFIOMpKiFvsQeEfFZlzynAv75YFm3ZDB4c4Wii_upu5xM9VfK1L0K3Baa32zUFJr6aDJaQvmwEBycBFw
 
 # services : is a list of our container
 services:
-  # name is optional for our mongodb
-  mymongodb:
-    # since mongo is an offical image we can use it.
-    image: "mongo"
+#  # name is optional for our mongodb
+#  mymongodb:
+#    # since mongo is an offical image we can use it.
+#    image: "mongo"
+#
+#    # the port that we want to publish for mongodb
+#    ports:
+#      - "27017:27017"
+#
+#    # our mongodb depends on volume to keep the data alive.
+#    volumes:
+#      - ./mongo/data:/data/db
+#
+#    # our environment variable
+#    environment:
+#      MONGO_INITDB_ROOT_USERNAME: "root"
+#      MONGO_INITDB_ROOT_PASSWORD: "pass123"
 
-    # the port that we want to publish for mongodb
-    ports:
-      - "27017:27017"
-
-    # our mongodb depends on volume to keep the data alive.
-    volumes:
-      - ./mongo/data:/data/db
-
-    # our environment variable
-    environment:
-      MONGO_INITDB_ROOT_USERNAME: "root"
-      MONGO_INITDB_ROOT_PASSWORD: "pass123"
-
-  # name is optional for our backend
-  backend:
-    # to build an image based on Dockerfile
-    # it looks in this folder to find Dockerfile to build an image
-    build: ./backend
-    # the port that we want to publish for backend
-    ports:
-      - "8080:8080"
-
-    # depends_on means it will start our backend container once mongo-container is  up and running.
-    depends_on:
-      - mymongodb
+#  # name is optional for our backend
+#  backend:
+#    # to build an image based on Dockerfile
+#    # it looks in this folder to find Dockerfile to build an image
+#    build: ./backend
+#    # the port that we want to publish for backend
+#    ports:
+#      - "8080:8080"
+#
+#    # depends_on means it will start our backend container once mongo-container is  up and running.
+#    depends_on:
+#      - mymongodb
 
   # name is optional for our frontend
   frontend:
@@ -44,17 +43,17 @@ services:
 
     # the port that we want to publish for frontend
     ports:
-      - "3000:3000"
+      - "5173:5173"
     # add bind mount volume to keep have updated source code
     volumes:
-      - ./frontend/reactapp/src:/app/src
+      - ./frontend/src:/app/src
     # allow interactive mode
     stdin_open: true
     tty: true
 
-    # it will start our frontend container once backend-container is  up and running.
-    depends_on:
-      - backend
+#    # it will start our frontend container once backend-container is  up and running.
+#    depends_on:
+#      - backend
 
 # declare the volumes name that our app is using.
 volumes:
