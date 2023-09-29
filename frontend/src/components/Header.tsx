@@ -2,7 +2,7 @@ import {useEffect, useState} from "react";
 import { Link } from 'react-router-dom'
 
 function Header() {
-    const [scrollDirection, setScrollDirection] = useState('')
+    const [scrollDirection, setScrollDirection] = useState<string>('')
 
     useEffect(() => {
         let lastScrollY: number = window.pageYOffset;
@@ -25,16 +25,16 @@ function Header() {
     console.log(scrollDirection)
 
     return(
-        <div className={`header ${scrollDirection === "down" ? "hide" : ""}`}>
-            {/*{console.log(document.getElementsByClassName('header hide'))}*/}
-            <Link to="/" className="logo">CompanyLogo</Link>
-            <div className="header-right">
-                <Link className="active" to="/login">Login</Link>
-                <Link to="/register">Register</Link>
-                <Link to="/contact">Contact</Link>
-                <Link to="/about">About</Link>
-            </div>
-        </div>
+      <div className={`header ${scrollDirection === "down" ? "hide" : ""}`}>
+          {/*{console.log(document.getElementsByClassName('header hide'))}*/}
+          <Link to="/" className="logo">CompanyLogo</Link>
+          <div className="header-right">
+              <Link className="active" to="/login">Login</Link>
+              <Link to="/register">Register</Link>
+              <Link to="/contact">Contact</Link>
+              <Link to="/about">About</Link>
+          </div>
+      </div>
     )
 }
 
