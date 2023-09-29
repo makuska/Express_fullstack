@@ -2,11 +2,11 @@ import ReactDOM from 'react-dom/client';
 import App from './App';
 
 import {createBrowserRouter, RouterProvider} from "react-router-dom";
+import LoginPage from "./pages/LoginPage.tsx";
+import RegisterPage from "./pages/RegisterPage.tsx";
+import NotFoundPage from "./pages/NotFoundPage.tsx";
 // import AboutPage from "./pages/AboutPage";
 // import ContactPage from "./pages/ContactPage";
-// import NotFoundPage from "./pages/NotFoundPage";
-// import LoginPage from "./pages/LoginPage";
-// import RegisterPage from "./pages/RegisterPage";
 
 const router = createBrowserRouter([
     {
@@ -22,18 +22,18 @@ const router = createBrowserRouter([
     //     path: "/contact",
     //     element: <ContactPage />,
     // },
-    // {
-    //     path: "/*",
-    //     element: <NotFoundPage />,
-    // },
-    // {
-    //     path: "/login",
-    //     element: <LoginPage />,
-    // },
-    // {
-    //     path: "/register",
-    //     element: <RegisterPage />,
-    // }
+    {
+        path: "/*",
+        element: <NotFoundPage />,
+    },
+    {
+        path: "/login",
+        element: <LoginPage />,
+    },
+    {
+        path: "/register",
+        element: <RegisterPage />,
+    }
     // {
     //     path: "/*",
     //     element: <Navigate to="/404"/>,
