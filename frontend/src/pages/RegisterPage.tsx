@@ -1,8 +1,8 @@
 import Header from "../components/Header";
 import {useState} from "react";
 import {NavigateFunction, useNavigate} from "react-router-dom";
-import { getUsernameFromDatabase } from "../services/registerPageService";
-import { getEmailFromDatabase } from "../services/registerPageService";
+import { getUsernameFromDatabase } from "../services/registerPageService.ts";
+import { getEmailFromDatabase } from "../services/registerPageService.ts";
 
 function RegisterPage() {
   const [username, setUsername] = useState<string>("")
@@ -16,6 +16,9 @@ function RegisterPage() {
   const [emailError, setEmailError] = useState<string>('')
 
   const navigate: NavigateFunction = useNavigate()
+  const passwordRegex: RegExp = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[^A-Za-z0-9])(?=.{8,})/
+  const usernameRegex: RegExp = /^\[A-z\][A-z0-9-_]{3,23}$/
+  const emailRegex: RegExp = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/
 
   const handleAgreementChange = (event: any): void => {
     setAgreedToTerms(event.target.checked);
@@ -40,6 +43,10 @@ function RegisterPage() {
       setUsernameError("Username is required")
       return;
     }
+    if (!usernameRegex.test(username)) {
+      setUsernameError("Username must be at between 3-23 characters long and can only contain letters and numbers");
+      return;
+    }
 
     const usernameExists = await getUsernameFromDatabase(username)
 
@@ -55,7 +62,10 @@ function RegisterPage() {
       setEmailError("Email is required")
       return;
     }
-    console.log('made this far')
+    if (!emailRegex.test(email)) {
+      setEmailError("Valid emails only!");
+      return;
+    }
     const emailExists = await getEmailFromDatabase(email)
 
     if (emailExists) {
@@ -71,8 +81,7 @@ function RegisterPage() {
       setPasswordError("Password is required")
       return;
     }
-
-    if (!/^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[^A-Za-z0-9])(?=.{8,})/.test(password)) {
+    if (!passwordRegex.test(password)) {
       setPasswordError("Password must be strong: at least 8 characters, including upper and lower case letters, numbers, and special characters.");
       return;
     }
@@ -82,6 +91,7 @@ function RegisterPage() {
   function onSignUpButtonClick(): void {
     if (!agreedToTerms) {
       alert("Please agree with the T&C first!")
+      return
     }
     alert(`User ${username} successfully registered!`)
   }
@@ -141,7 +151,7 @@ function RegisterPage() {
           <label className="input-labels-registration">Confirm password</label>
           <input
             placeholder="password"
-            value={password}
+            value={confirmationPassword}
             onChange={e => setConfirmationPassword(e.target.value)}
             onBlur={validateConfirmationPassword}
             className="input-box"/>

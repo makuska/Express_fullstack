@@ -1,9 +1,9 @@
 import { configDotenv } from "dotenv";
 import jsonwebtoken from "jsonwebtoken";
 import {checkIfTokenIsRevoked, revokeToken} from "../repository/tokenRepository.js";
-import {refreshTokenOptions} from "../utils/tokenUtils.js";
+import {createRefreshToken} from "../utils/tokenUtils.js";
 import {cookieOptions} from "../utils/cookieOptions.js";
-import {randomUUID} from "crypto";
+
 
 configDotenv()
 
@@ -32,11 +32,8 @@ export async function rotateRefreshToken(req, res){
 
         await revokeToken(decodedRefreshToken, clientIP)
 
-        const newRefreshToken = jsonwebtoken.sign(
-            {id: decodedRefreshToken.id, role: decodedRefreshToken.role, token_id: randomUUID()},
-            REFRESH_TOKEN_SECRET,
-            refreshTokenOptions
-        )
+        // TODO ilmselt peaks ka uue accessTokeni looma ja clinetile need tagastama vastavalt (headeris ja cookiena)
+        const newRefreshToken = createRefreshToken(decodedRefreshToken.id, decodedRefreshToken.role)
 
         res.cookie('refreshToken', newRefreshToken, cookieOptions);
     } catch (err) {

@@ -2,10 +2,8 @@ import jsonwebtoken from 'jsonwebtoken'
 import bcrypt from 'bcrypt'
 import {validateUserSignupData} from '../utils/DataValidation.js'
 import db from '../db/conn.mjs'
-import {accessTokenOptions} from "../utils/tokenUtils.js";
-import {refreshTokenOptions} from "../utils/tokenUtils.js";
+import {createAccessToken, createRefreshToken} from "../utils/tokenUtils.js";
 import {cookieOptions} from "../utils/cookieOptions.js";
-import { randomUUID } from 'crypto'
 import {saveRefreshTokenToCollection} from "../repository/tokenRepository.js";
 
 
@@ -23,8 +21,7 @@ export function getNewAccessToken(req, res) {
             return res.status(401).send({ message: 'Access Denied. Refresh token has expired.' });
         }
 
-        const payload = { id: decodedRefreshToken.id, role: decodedRefreshToken.role };
-        const accessToken = jsonwebtoken.sign(payload, process.env.ACCESS_TOKEN_SECRET, accessTokenOptions);
+        const accessToken = createAccessToken(decodedRefreshToken.id, decodedRefreshToken.role)
 
         res
             .header('Authorization', accessToken)
@@ -82,10 +79,8 @@ export async function login(req, res) {
             return res.status(404).send({ accessToken: null, message: "Invalid password" });
         }
 
-        const accessTokenPayload = { id: user._id, role: user.role }
-        const refreshTokenPayload = { id: user._id, role: user.role, token_id: randomUUID() }
-        const accessToken = jsonwebtoken.sign(accessTokenPayload, process.env.ACCESS_TOKEN_SECRET, accessTokenOptions);
-        const refreshToken = jsonwebtoken.sign(refreshTokenPayload, process.env.REFRESH_TOKEN_SECRET, refreshTokenOptions);
+        const accessToken = createAccessToken(user._id, user.role)
+        const refreshToken = createRefreshToken(user._id, user.role)
 
         // save refreshToken to the database
         const clientIP = req.ip
@@ -95,14 +90,10 @@ export async function login(req, res) {
             .cookie('refreshToken', refreshToken, cookieOptions)
             .header('Authorization', accessToken)
             .status(200).send({
-            id: user._id,
             username: user.username,
-            role: user.role,
-            email: user.email,
-            accessToken: accessToken
         });
     } catch (err) {
-        console.error("Error during signin:", err);
+        console.error("Error during login:", err);
         res.status(500).send({ message: err });
     }
 }

@@ -58,20 +58,3 @@ export async function saveRefreshTokenToCollection(refreshToken, clientIP) {
         throw new Error(`Error: ${e}`)
     }
 }
-
-// export async function revokeToken(decodedRefreshToken, clientIP) {
-//     try {
-//         await db.collection(collectionName).insertOne({
-//             token_id: decodedRefreshToken.token_id,
-//             clientIP: clientIP,
-//             tokenExpDateSeconds: decodedRefreshToken.exp,
-//             isValid: false
-//         }, (err) => {
-//             if (err) {
-//                 throw new Error(`Error occurred when saving the revoked token the database, error message: ${err}`)
-//             }
-//         })
-//     } catch (err) {
-//         throw new Error(`Error occurred when searching for the token from the database, error message: ${err}`)
-//     }
-// }

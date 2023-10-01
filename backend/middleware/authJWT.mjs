@@ -1,6 +1,6 @@
 import jsonwebtoken from 'jsonwebtoken'
 import { configDotenv } from "dotenv";
-import {accessTokenOptions} from "../utils/tokenUtils.js";
+import { createAccessToken } from "../utils/tokenUtils.js";
 import util from 'util'
 import {rotateRefreshToken} from "../services/tokenRotation.js";
 
@@ -28,11 +28,8 @@ export function verifyToken(req, res, next) {
                         }
 
                         req.user = { id: decodedRefreshToken.id, role: decodedRefreshToken.role };
-                        const payload = {id: decodedRefreshToken.id, role: decodedRefreshToken.role}
-                        const newAccessToken = jsonwebtoken.sign(payload, process.env.ACCESS_TOKEN_SECRET, accessTokenOptions)
-                        // also create a new refreshToken
+                        const newAccessToken = createAccessToken(decodedRefreshToken.id, decodedRefreshToken.role)
                         await rotateRefreshToken(req, res)
-                        // call the rotateRefreshToken function to handle this.
 
                         req.header.authorization = `Bearer ${newAccessToken}`;
                         next()
@@ -40,7 +37,7 @@ export function verifyToken(req, res, next) {
                         return res.status(400).send({ message: "Unable to verify the refreshToken", error: e })
                     }
                 }
-                // invalid token (tampered)
+                // // invalid token (tampered)
                 // return res.status(400).send({ message: "Invalid token, please provide a valid refresh token!"})
             }
             if (decoded) {
@@ -67,27 +64,3 @@ export function isUser(req, res, next) {
         next()
     } else return res.status(401).send({ message: "Unauthorized!" })
 }
-
-
-// export function verifyToken(req, res, next) {
-//     if (req.headers.authorization && req.headers.authorization.split(' ')[0] === 'Bearer') {
-//         jsonwebtoken.verify(req.headers.authorization.split(' ')[1], process.env.ACCESS_TOKEN_SECRET, async (err, decoded) => {
-//             if (err) {
-//                 req.user = undefined;
-//                 return res.status(403).send({ message: "Unauthorized" });
-//             }
-//             const user = await db.collection('User').findOne({ _id: new ObjectId(decoded.id) });
-//
-//             if (!user) {
-//                 req.user = undefined;
-//             } else {
-//                 req.user = user;
-//             }
-//
-//             next();
-//         });
-//     } else {
-//         req.user = undefined;
-//         next()
-//     }
-// }

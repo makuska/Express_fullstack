@@ -1,26 +1,27 @@
 import {useState} from "react";
 import {NavigateFunction, useNavigate} from "react-router-dom";
 import Header from "../components/Header";
+import {frontendUserLogin} from "../services/authService.ts";
 
 function LoginPage() {
-  const [email, setEmail] = useState<string>("")
+  const [username, setUsername] = useState<string>("")
   const [password, setPassword] = useState<string>("")
-  const [emailError, setEmailError] = useState<string>("")
+  const [usernameError, setUsernameError] = useState<string>("")
   const [passwordError, setPasswordError] = useState<string>("")
 
   const navigate: NavigateFunction = useNavigate();
 
-  const onButtonClick = (): undefined | number => {
+  function onLoginButtonClick(): undefined | number {
     // Set initial error values to empty
-    setEmailError("")
+    setUsernameError("")
     setPasswordError("")
 
-    if ("" === email) {
-      setEmailError("Please enter your email")
+    if ("" === username) {
+      setUsernameError("Please enter your username")
       return
     }
-    if (!/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/.test(email)) {
-      setEmailError("Please enter a valid email")
+    if (username.length < 2) {
+      setUsernameError("Usernames are at least 3 characters long, don't you remember?!")
       return
     }
     if ("" === password) {
@@ -33,7 +34,7 @@ function LoginPage() {
     }
 
     // Authentication calls will be made here...
-
+    frontendUserLogin(username, password)
   }
 
   function navigateToRegisterPage(): void {
@@ -50,14 +51,13 @@ function LoginPage() {
         <br />
         <div className="input-container">
           <input
-            value={email}
-            placeholder="Enter your email here"
-            onChange={e => setEmail(e.target.value)}
+            value={username}
+            placeholder="Enter your username here"
+            onChange={e => setUsername(e.target.value)}
             className="input-box" />
-          <label className="error-label">{emailError}</label>
+          <label className="error-label">{usernameError}</label>
         </div>
         <br />
-        {/* TODO USERNAME INPUT FIELD */}
         <div className="input-container">
           <input
             value={password}
@@ -71,7 +71,7 @@ function LoginPage() {
           <input
             className="input-button"
             type="button"
-            onClick={onButtonClick}
+            onClick={onLoginButtonClick}
             value={"Log in"} />
         </div>
         <br/>
