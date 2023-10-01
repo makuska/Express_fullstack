@@ -15,6 +15,7 @@ export async function getUsernameFromDatabase(username: string) {
     const response: Response = await fetch(endpoint, requestOptions)
 
     if (!response.ok) {
+      // @ts-ignore
       const error = (response && response.message) || response.status
       return Promise.reject(error)
     }
@@ -41,6 +42,7 @@ export async function getEmailFromDatabase(email: string) {
     const response: Response = await fetch(endpoint, requestOptions)
 
     if (!response.ok) {
+      // @ts-ignore
       const error = (response && response.message) || response.status
       return Promise.reject(error)
     }

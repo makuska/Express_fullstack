@@ -29,6 +29,7 @@ function DataTableComponent() {
             }
             return 0;
         });
+        // @ts-ignore
         setData(sortedData);
         setSortColumn(column);
         setSortDirection(direction);

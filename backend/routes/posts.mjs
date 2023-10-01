@@ -7,7 +7,6 @@ const postsRouter = Router()
 const collectionName = 'posts'
 dotenvConfig()
 
-console.log("POSTS_API from .env: ", process.env.POSTS_API)
 postsRouter.get('/', async (req, res) => {
     const collection = db.collection(collectionName);
     const results = await collection.find({})

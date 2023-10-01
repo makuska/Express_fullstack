@@ -11,19 +11,31 @@ function LoginPage() {
 
   const navigate: NavigateFunction = useNavigate();
 
-  function onLoginButtonClick(): undefined | number {
-    // Set initial error values to empty
-    setUsernameError("")
-    setPasswordError("")
+  function onLoginButtonClick(): void {
+    console.log(`login clicked, username: ${username}, password: ${password}`)
+    // Authentication calls will be made here...
+    frontendUserLogin(username, password)
+  }
 
+  function navigateToRegisterPage(): void {
+    navigate("/register")
+  }
+
+  function validateUsername() {
+    setUsernameError("")
     if ("" === username) {
       setUsernameError("Please enter your username")
       return
     }
-    if (username.length < 2) {
+    if (username.length <= 3) {
       setUsernameError("Usernames are at least 3 characters long, don't you remember?!")
       return
     }
+  }
+
+  function validatePassword() {
+    setPasswordError("")
+
     if ("" === password) {
       setPasswordError("Please enter a password")
       return
@@ -32,13 +44,6 @@ function LoginPage() {
       setPasswordError("The password must be 8 characters or longer")
       return 1
     }
-
-    // Authentication calls will be made here...
-    frontendUserLogin(username, password)
-  }
-
-  function navigateToRegisterPage(): void {
-    navigate("/register")
   }
 
   return (
@@ -54,6 +59,7 @@ function LoginPage() {
             value={username}
             placeholder="Enter your username here"
             onChange={e => setUsername(e.target.value)}
+            onBlur={validateUsername}
             className="input-box" />
           <label className="error-label">{usernameError}</label>
         </div>
@@ -61,8 +67,10 @@ function LoginPage() {
         <div className="input-container">
           <input
             value={password}
+            type="password"
             placeholder="Enter your password here"
             onChange={e => setPassword(e.target.value)}
+            onBlur={validatePassword}
             className="input-box" />
           <label className="error-label">{passwordError}</label>
         </div>

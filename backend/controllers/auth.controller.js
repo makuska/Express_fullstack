@@ -91,6 +91,8 @@ export async function login(req, res) {
             .header('Authorization', accessToken)
             .status(200).send({
             username: user.username,
+            accessToken: accessToken,
+            refreshToken: refreshToken
         });
     } catch (err) {
         console.error("Error during login:", err);

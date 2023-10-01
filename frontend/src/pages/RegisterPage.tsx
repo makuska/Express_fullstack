@@ -141,6 +141,7 @@ function RegisterPage() {
           <input
             placeholder="password"
             value={password}
+            type="password"
             onChange={e => setPassword(e.target.value)}
             onBlur={validatePassword}
             className="input-box"/>
@@ -152,6 +153,7 @@ function RegisterPage() {
           <input
             placeholder="password"
             value={confirmationPassword}
+            type="password"
             onChange={e => setConfirmationPassword(e.target.value)}
             onBlur={validateConfirmationPassword}
             className="input-box"/>
