@@ -42,8 +42,6 @@ export async function signup(req, res) {
     }
 
     try {
-        validateUserSignupData(user);
-
         const result = await db.collection('User').insertOne(user);
 
         // insertOne returns an acknowledgement and the _id value of the newly inserted document - so we can use the id field as an additional check
@@ -66,7 +64,7 @@ export async function login(req, res) {
         const user = await db.collection('User').findOne({ username: req.body.username });
 
         if (!user) {
-            return res.status(404).send({ message: `User with username: ${req.body.username} not found!` });
+            return res.status(404).send({ message: `User not found` });
         }
 
         // Compare passwords

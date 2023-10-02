@@ -11,11 +11,8 @@ function LoginPage() {
 
   const navigate: NavigateFunction = useNavigate();
 
-  function onLoginButtonClick(): void {
-    console.log(`login clicked, username: ${username}, password: ${password}`)
-    // Authentication calls will be made here...
-    frontendUserLogin(username, password)
-  }
+  const passwordRegex: RegExp = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[^A-Za-z0-9])(?=.{8,})/
+  const usernameRegex: RegExp = /^[A-Za-z0-9]{3,23}$/
 
   function navigateToRegisterPage(): void {
     navigate("/register")
@@ -27,23 +24,37 @@ function LoginPage() {
       setUsernameError("Please enter your username")
       return
     }
-    if (username.length <= 3) {
+    if (!usernameRegex.test(username)) {
       setUsernameError("Usernames are at least 3 characters long, don't you remember?!")
       return
     }
   }
 
-  function validatePassword() {
+  function validatePassword(): void {
     setPasswordError("")
 
     if ("" === password) {
       setPasswordError("Please enter a password")
       return
     }
-    if (password.length < 7) {
+    if (!passwordRegex.test(password)) {
       setPasswordError("The password must be 8 characters or longer")
-      return 1
+      return
     }
+  }
+
+  function onLoginButtonClick(): void {
+    if (!username || !password) {
+      alert('Please fill in all required fields.')
+      return
+    }
+    // Check for validation errors
+    if (usernameError || passwordError) {
+      alert('Please fix the validation errors before signing up.')
+      return
+    }
+
+    frontendUserLogin(username, password)
   }
 
   return (

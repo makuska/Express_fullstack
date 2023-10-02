@@ -3,6 +3,7 @@ import {useState} from "react";
 import {NavigateFunction, useNavigate} from "react-router-dom";
 import { getUsernameFromDatabase } from "../services/registerPageService.ts";
 import { getEmailFromDatabase } from "../services/registerPageService.ts";
+import {frontendUserRegister} from "../services/authService.ts";
 
 function RegisterPage() {
   const [username, setUsername] = useState<string>("")
@@ -14,10 +15,12 @@ function RegisterPage() {
   const [usernameError, setUsernameError] = useState<string>('')
   const [passwordError, setPasswordError] = useState<string>('')
   const [emailError, setEmailError] = useState<string>('')
+  const [confirmPasswordError, setConfirmPasswordError] = useState<string>('')
 
   const navigate: NavigateFunction = useNavigate()
+
   const passwordRegex: RegExp = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[^A-Za-z0-9])(?=.{8,})/
-  const usernameRegex: RegExp = /^\[A-z\][A-z0-9-_]{3,23}$/
+  const usernameRegex: RegExp = /^[A-Za-z0-9]{3,23}$/
   const emailRegex: RegExp = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/
 
   const handleAgreementChange = (event: any): void => {
@@ -88,21 +91,38 @@ function RegisterPage() {
   }
 
 
-  function onSignUpButtonClick(): void {
+  async function onSignUpButtonClick(): Promise<void> {
+    if (!username || !email || !password || !confirmationPassword) {
+      alert('Please fill in all required fields.')
+      return
+    }
+    // Check for validation errors
+    if (usernameError || emailError || passwordError || confirmPasswordError) {
+      alert('Please fix the validation errors before signing up.')
+      return
+    }
+
     if (!agreedToTerms) {
       alert("Please agree with the T&C first!")
       return
     }
-    alert(`User ${username} successfully registered!`)
+    const registrationSuccessful = await frontendUserRegister(username, email, password)
+    if (registrationSuccessful) {
+      navigate('/login')
+      alert(`User ${username} successfully registered!`)
+    } else {
+      console.error("Unable to register the user, please refresh the page and try again!")
+    }
   }
 
   function navigateToLoginPage(): void {
     navigate("/login")
   }
 
-  function validateConfirmationPassword(): string | undefined {
+  function validateConfirmationPassword(): void {
+    setConfirmPasswordError("")
     if (confirmationPassword !== password) {
-      return "The passwords must match, please type again!"
+      setConfirmPasswordError("The passwords must match, please type again!")
     }
   }
 
@@ -157,6 +177,7 @@ function RegisterPage() {
             onChange={e => setConfirmationPassword(e.target.value)}
             onBlur={validateConfirmationPassword}
             className="input-box"/>
+          <label className="error-label">{confirmPasswordError}</label>
         </div>
         <br />
         <div className="input-container register">
