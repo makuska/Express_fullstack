@@ -1,12 +1,18 @@
-import { createContext, useContext, useState } from 'react';
+import {createContext, ReactNode, useContext, useState} from 'react';
 import {frontendUserLogin} from "../services/authService.ts";
+import {AuthProviderType} from "../types/authTypes.ts";
 
-const AuthContext = createContext();
+// The default value is only used when a component tries to consume the context outside of the AuthProvider component
+const AuthContext = createContext<AuthProviderType | null>(null);
 
-export const AuthProvider = ({ children }) => {
+type Props = {
+  children: ReactNode
+}
+
+export function AuthProvider({ children }: Props) {
   const [user, setUser] = useState(null);
 
-  const login = async (username, password) => {
+  const login = async (username: string, password: string): Promise<void> => {
     try {
       await frontendUserLogin(username, password);
       // Optionally, you can add logic here to handle any further actions after login.
@@ -15,7 +21,7 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const logout = () => {
+  const logout = (): void => {
     // Clear user data to log out
     setUser(null);
   };
@@ -25,8 +31,12 @@ export const AuthProvider = ({ children }) => {
       {children}
     </AuthContext.Provider>
   );
-};
+}
 
 export const useAuth = () => {
-  return useContext(AuthContext);
+  const context: AuthProviderType | null = useContext(AuthContext);
+  if (context === null) {
+    throw new Error('useAuth must be used within an AuthProvider');
+  }
+  return context;
 };
