@@ -1,9 +1,10 @@
-import {LoginResponseType} from "../types/authTypes.ts";
+import {LoginResponse} from "../types/authTypes.ts";
 import {loginEndpoint, logoutEndpoint, registerEndpoint} from "../constants/authEndpoints.ts";
 import {useLocalStorage} from "../hooks/useLocalStorage.ts";
 
 export async function frontendUserLogin(username: string, password: string): Promise<void> {
-  const {setItem} = useLocalStorage()
+  // const {setItem} = useLocalStorage()
+  console.log('inside frontendUserLogin')
   try {
     const res: Response = await fetch(loginEndpoint, {
       method: 'POST',
@@ -17,12 +18,12 @@ export async function frontendUserLogin(username: string, password: string): Pro
     })
 
     if (res.ok) {
-      const responseData: LoginResponseType = await res.json()
+      const responseData: LoginResponse = await res.json()
       // const refreshToken = getCookieKeyFromBackend('refreshToken')
       const refreshToken: string = responseData.refreshToken
       const accessToken: string = responseData.accessToken
 
-      setItem('accessToken', accessToken)
+      localStorage.setItem('accessToken', accessToken)
       // localStorage.setItem('accessToken', accessToken)
       document.cookie = `refreshToken=${refreshToken};maxAge=1209600`
       console.log(responseData)
@@ -93,7 +94,8 @@ export async function frontendUserLogout(): Promise<void> {
 
 // const authService = {
 //   frontendUserLogin,
-//   frontendUserRegister
+//   frontendUserRegister,
+//   frontendUserLogout
 // }
 //
 // export default authService

@@ -1,23 +1,44 @@
-import {useLocalStorage} from "./useLocalStorage.ts";
-import {parseJwt} from "../utils/tokenUtils.ts";
+import { useEffect } from "react";
+import { useUser } from "./useUser";
+import { useLocalStorage } from "./useLocalStorage";
+import {frontendUserLogin, frontendUserLogout} from "../services/authService.ts";
+import {User} from "../types/authTypes.ts";
 
-function useAuth() {
-  const {getItem} = useLocalStorage()
-  const token = getItem('accessToken')
-  let isUser = false
-  let isAdmin = false
+export const useAuth = () => {
+  const { user, addUser, removeUser, setUser } = useUser();
+  const { getItem } = useLocalStorage();
 
-  if (token) {
-    const decodedToken = parseJwt(token)
-    const { username, role } = decodedToken
+  useEffect(() => {
+    const user = getItem("user");
+    if (user) {
+      addUser(JSON.parse(user));
+    }
+  }, []);
 
-    if (role === 'admin') isAdmin = true
-    if (role === 'user') isUser = true
+  const login = async (username: string, password: string): Promise<void> => {
+    const user: User = {
+      username: username,
+      email: 'sampleEmail'
+    }
+    console.log(user)
+    try {
+      console.log('trying login')
+      await frontendUserLogin(username, password);
+      // Another possibility is to return the user data from the function above and then create the User object
+      addUser(user);
+    } catch (error) {
+      throw Error("Unable to log in, please try again!")
+    }
+  };
 
-    return { username, role, isAdmin, isUser }
-  }
+  const logout = async () => {
+    try {
+      await frontendUserLogout()
+      removeUser()
+    } catch (e) {
+      throw Error("Unable to log out, please try again!")
+    }
+  };
 
-  return { username: '', role: '', isUser, isAdmin }
-}
-
-export default useAuth
+  return { user, login, logout, setUser };
+};

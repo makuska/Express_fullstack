@@ -2,19 +2,21 @@ import './App.scss'
 import Header from "./components/Header";
 import Footer from "./components/Footer";
 import DataTable from "./components/DataTable";
-import {AuthProvider} from "./context/AuthProvider.tsx";
+import {AuthContext} from "./context/AuthContext.tsx";
+import {useAuth} from "./hooks/useAuth.ts";
 
 function App() {
+  const { user, setUser } = useAuth();
 
   return (
     <>
-      <AuthProvider.Provider value>
+      <AuthContext.Provider value={{ user, setUser }}>
         <Header />
           <div className="body-content">
             <DataTable />
           </div>
         <Footer />
-      </AuthProvider.Provider>
+      </AuthContext.Provider>
     </>
   )
 }
