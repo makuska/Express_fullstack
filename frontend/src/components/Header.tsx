@@ -29,6 +29,7 @@ function Header() {
           {/*{console.log(document.getElementsByClassName('header hide'))}*/}
           <Link to="/" className="logo">CompanyLogo</Link>
           <div className="header-right">
+              <a href="http://localhost:8080/isUser">Protected resource</a>
               <Link className="active" to="/login">Login</Link>
               <Link to="/register">Register</Link>
               <Link to="/contact">Contact</Link>

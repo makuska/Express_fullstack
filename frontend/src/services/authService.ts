@@ -1,7 +1,9 @@
 import {LoginResponseType} from "../types/authTypes.ts";
-import {loginEndpoint, registerEndpoint} from "../constants/authEndpoints.ts";
+import {loginEndpoint, logoutEndpoint, registerEndpoint} from "../constants/authEndpoints.ts";
+import {useLocalStorage} from "../hooks/useLocalStorage.ts";
 
 export async function frontendUserLogin(username: string, password: string): Promise<void> {
+  const {setItem} = useLocalStorage()
   try {
     const res: Response = await fetch(loginEndpoint, {
       method: 'POST',
@@ -20,7 +22,8 @@ export async function frontendUserLogin(username: string, password: string): Pro
       const refreshToken: string = responseData.refreshToken
       const accessToken: string = responseData.accessToken
 
-      localStorage.setItem('accessToken', accessToken)
+      setItem('accessToken', accessToken)
+      // localStorage.setItem('accessToken', accessToken)
       document.cookie = `refreshToken=${refreshToken};maxAge=1209600`
       console.log(responseData)
     } else {
@@ -65,3 +68,32 @@ export async function frontendUserRegister(username: string, email: string, pass
     return false
   }
 }
+
+export async function frontendUserLogout(): Promise<void> {
+  const { removeItem } = useLocalStorage()
+  // Since every httpOnly cookie is sent with every HTTP request, there is no need to send it manually
+  try {
+    const res: Response = await fetch(logoutEndpoint, {
+      method: "DELETE",
+      headers: {
+        "Content-type": "application/json; charset=UTF-8"
+      }
+    })
+    if (res.status === 200) {
+      removeItem("accessToken")
+    } else {
+      const errorData = await res.json()
+      alert(`Registration error: ${errorData.message}`)
+      return console.error(`Registration error: ${errorData.message}`)
+    }
+  } catch (e) {
+    console.error("Unable to log out, error: ", e)
+  }
+}
+
+// const authService = {
+//   frontendUserLogin,
+//   frontendUserRegister
+// }
+//
+// export default authService

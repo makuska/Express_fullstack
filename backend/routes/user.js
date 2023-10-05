@@ -12,6 +12,6 @@ userRoute.post('/api/auth/signin', loginSchema, authController.login)
 userRoute.get('/isAdmin', [verifyToken, isAdmin], authController.sampleAdminEvent)
 userRoute.get('/isUser', [verifyToken, isUser], authController.sampleUserEvent)
 userRoute.post('/api/auth/newToken', authController.getNewAccessToken)
-userRoute.get('api/auth/logout', authController.logout)
+userRoute.delete('api/auth/logout', authController.logout)
 
 export default userRoute;

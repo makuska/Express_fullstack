@@ -1,10 +1,10 @@
-import jsonwebtoken from 'jsonwebtoken'
+import jsonwebtoken, {decode} from 'jsonwebtoken'
 import bcrypt from 'bcrypt'
 import {validateUserSignupData} from '../utils/DataValidation.js'
 import db from '../db/conn.mjs'
 import {createAccessToken, createRefreshToken} from "../utils/tokenUtils.js";
 import {cookieOptions} from "../utils/cookieOptions.js";
-import {saveRefreshTokenToCollection} from "../repository/tokenRepository.js";
+import {revokeToken, saveRefreshTokenToCollection} from "../repository/tokenRepository.js";
 
 
 export function getNewAccessToken(req, res) {
@@ -99,11 +99,18 @@ export async function login(req, res) {
 }
 
 export async function logout(req, res) {
-    const refreshTokenCookie = req.cookie['refreshToken']
+    const refreshTokenFromCookie = req.cookie['refreshToken']
+    const decodedRefreshToken = jsonwebtoken.verify(refreshTokenFromCookie, process.env.REFRESH_TOKEN_SECRET, (err) => {
+        if (err) {
+            console.error("Unable to verify the refreshToken for the logout request!")
+            res.clearCookie('refreshToken')
+            return res.status(204)
+        }
+    })
 
     // Check if the refreshToken is in the database
     try {
-        const foundRT = await db.collection('RefreshTokens').findOne()
+        const foundRT = await revokeToken(decodedRefreshToken, req.ip)
 
         if (!foundRT) {
             res.clearCookie('refreshToken')
@@ -116,7 +123,6 @@ export async function logout(req, res) {
     }
 
     res.clearCookie('refreshToken')
-
 }
 
 export function sampleUserEvent(req, res) {

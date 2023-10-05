@@ -103,4 +103,23 @@ https://community.auth0.com/t/does-jwt-decode-functionality-verify-the-token-or-
 `verify` on the other hand decodes the token and verifies the signature (**async**)
 
 curl token:
+```bash
 curl -i -H "authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY1MDJlMzY1NGFhZmQ4NGYwODBlNzY4YiIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTY5NTI4ODMwMywiZXhwIjoxNjk1Mjg4NDIzfQ.9T-39WCqaPj076Vta7JjDF1n5rjLbPykHmdqhovzlHg" -b "refreshToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY1MDJlMzY1NGFhZmQ4NGYwODBlNzY4YiIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTY5NTI4ODMwMywiZXhwIjoxNjk2NDk3OTAzfQ.mtgj_B2M5W6OTRt_x-NNVKWWDRs1pMr2Jmib8AAkhDY" localhost:8080/isAdmin2
+```
+
+### Deep dive into react hooks
+https://www.netlify.com/blog/2019/03/11/deep-dive-how-do-react-hooks-really-work/
+
+### React `useContext` hook in auth
+https://dev.to/dayvster/use-react-context-for-auth-288g
+
+### Multithreading vs asynchronous coding Spring example
+If you're asking in a webdev context, the Spring framework (which is a very popular Java web framework) is inherently multi-threaded. Each request to the controller will spawn a thread. Explicit multi-threading can be done via the @Async annotated method. It is very rare to explicitly code the multi-threading stuff manually.
+
+However, if you're not using the Spring framework, then it might be a different story.
+
+I can give you 2 example use-cases where I did multi-threading recently (#1 is using Futures, #2 is using @Async method):
+
+Client UI calls a search API; backend master thread spawn 4 child threads to call 4 different search provider in parallel, which will return the search results from different modules; when all 4 threads are completed, master thread will combine the search results and respond back to frontend.
+
+Client UI uploads an excel file for importing data; backend master thread stores the file, spawn a child thread to process the file data, then immediately returns a response to UI without waiting for the file to be fully processed. The child thread will continue to process the file into the DB in the background.
