@@ -22,7 +22,6 @@ export const useAuth = () => {
     }
     console.log(user)
     try {
-      console.log('trying login')
       await frontendUserLogin(username, password);
       // Another possibility is to return the user data from the function above and then create the User object
       addUser(user);

@@ -1,10 +1,7 @@
 import {LoginResponse} from "../types/authTypes.ts";
 import {loginEndpoint, logoutEndpoint, registerEndpoint} from "../constants/authEndpoints.ts";
-import {useLocalStorage} from "../hooks/useLocalStorage.ts";
 
 export async function frontendUserLogin(username: string, password: string): Promise<void> {
-  // const {setItem} = useLocalStorage()
-  console.log('inside frontendUserLogin')
   try {
     const res: Response = await fetch(loginEndpoint, {
       method: 'POST',
@@ -24,7 +21,6 @@ export async function frontendUserLogin(username: string, password: string): Pro
       const accessToken: string = responseData.accessToken
 
       localStorage.setItem('accessToken', accessToken)
-      // localStorage.setItem('accessToken', accessToken)
       document.cookie = `refreshToken=${refreshToken};maxAge=1209600`
       console.log(responseData)
     } else {
@@ -71,7 +67,6 @@ export async function frontendUserRegister(username: string, email: string, pass
 }
 
 export async function frontendUserLogout(): Promise<void> {
-  const { removeItem } = useLocalStorage()
   // Since every httpOnly cookie is sent with every HTTP request, there is no need to send it manually
   try {
     const res: Response = await fetch(logoutEndpoint, {
@@ -81,7 +76,7 @@ export async function frontendUserLogout(): Promise<void> {
       }
     })
     if (res.status === 200) {
-      removeItem("accessToken")
+      localStorage.removeItem("accessToken")
     } else {
       const errorData = await res.json()
       alert(`Registration error: ${errorData.message}`)
