@@ -4,12 +4,6 @@ export interface LoginResponse {
   accessToken: string
 }
 
-// export interface AuthProviderType {
-//   user: {} | null,
-//   login: (username: string, password: string) => Promise<void>,
-//   logout: () => void
-// }
-
 export interface User {
   username: string;
   email: string;
