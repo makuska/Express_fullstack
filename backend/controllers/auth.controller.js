@@ -84,11 +84,17 @@ export async function login(req, res) {
         const clientIP = req.ip
         await saveRefreshTokenToCollection(refreshToken, clientIP)
 
+        const resUser = {
+            username: user.username,
+            email: user.email,
+            accessToken: accessToken
+        }
+
         res
             .cookie('refreshToken', refreshToken, cookieOptions)
             .header('Authorization', accessToken)
             .status(200).send({
-            username: user.username,
+            resUser,
             accessToken: accessToken,
             refreshToken: refreshToken
         });

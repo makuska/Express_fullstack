@@ -1,5 +1,5 @@
 export interface LoginResponse {
-  name: string,
+  resUser: User
   refreshToken: string,
   accessToken: string
 }

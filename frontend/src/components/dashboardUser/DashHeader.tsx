@@ -1,12 +1,12 @@
 import {Link, NavigateFunction, useNavigate} from 'react-router-dom'
-import {useAuth} from "../../hooks/useAuth.ts";
+import useAuth from "../../hooks/useAuth.tsx";
 
 function DashHeader() {
   const navigate: NavigateFunction = useNavigate();
   const {logout, user} = useAuth()
 
-  async function handleLogoutButtonCLick() {
-      await logout()
+  function handleLogoutButtonCLick() {
+      logout()
       navigate('/')
   }
 
@@ -18,7 +18,7 @@ function DashHeader() {
         <Link className="active" onClick={handleLogoutButtonCLick} to="/login">Logout</Link>
       </div>
       <div className="header">
-        Hello {user.username}
+        Hello {user!.username}
       </div>
     </div>
   )

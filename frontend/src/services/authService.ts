@@ -1,7 +1,7 @@
-import {LoginResponse} from "../types/authTypes.ts";
+import {LoginResponse, User} from "../types/authTypes.ts";
 import {loginEndpoint, logoutEndpoint, registerEndpoint} from "../constants/authEndpoints.ts";
 
-export async function frontendUserLogin(username: string, password: string): Promise<void> {
+export async function frontendUserLogin(username: string, password: string): Promise<User | null> {
   try {
     const res: Response = await fetch(loginEndpoint, {
       method: 'POST',
@@ -22,7 +22,8 @@ export async function frontendUserLogin(username: string, password: string): Pro
 
       localStorage.setItem('accessToken', accessToken)
       document.cookie = `refreshToken=${refreshToken};maxAge=1209600`
-      console.log(responseData)
+      // console.log(responseData.resUser)
+      return responseData.resUser
     } else {
       const errorData = await res.json();
       alert(`Authentication failed: ${errorData.message}`)
@@ -32,6 +33,7 @@ export async function frontendUserLogin(username: string, password: string): Pro
   } catch (e) {
     console.error("Unable to log in the user, error: ", e)
   }
+  return null
 }
 
 

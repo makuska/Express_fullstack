@@ -1,22 +1,18 @@
 import './App.scss'
-import Header from "./components/Header";
-import Footer from "./components/Footer";
-import DataTable from "./components/DataTable";
-import {AuthContext} from "./context/AuthContext.tsx";
-import {useAuth} from "./hooks/useAuth.ts";
+import {AuthProvider} from "./hooks/useAuth.tsx";
+import {BrowserRouter} from "react-router-dom";
+import AppRouter from "./routing/AppRouter.tsx";
+
 
 function App() {
-  const { user, setUser } = useAuth();
 
   return (
     <>
-      <AuthContext.Provider value={{ user, setUser }}>
-        <Header />
-          <div className="body-content">
-            <DataTable />
-          </div>
-        <Footer />
-      </AuthContext.Provider>
+      <BrowserRouter>
+        <AuthProvider>
+          <AppRouter />
+        </AuthProvider>
+      </BrowserRouter>
     </>
   )
 }

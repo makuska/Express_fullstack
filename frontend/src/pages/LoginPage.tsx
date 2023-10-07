@@ -1,7 +1,7 @@
 import {useState} from "react";
 import {NavigateFunction, useNavigate} from "react-router-dom";
 import Header from "../components/Header";
-import {useAuth} from "../hooks/useAuth.ts";
+import useAuth from "../hooks/useAuth.tsx";
 
 function LoginPage() {
   const [username, setUsername] = useState<string>("")
@@ -10,7 +10,7 @@ function LoginPage() {
   const [passwordError, setPasswordError] = useState<string>("")
 
   const navigate: NavigateFunction = useNavigate();
-  const {login} = useAuth()
+  const { login } = useAuth()
 
   const passwordRegex: RegExp = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[^A-Za-z0-9])(?=.{8,})/
   const usernameRegex: RegExp = /^[A-Za-z0-9]{3,23}$/
@@ -56,7 +56,7 @@ function LoginPage() {
     }
 
     // frontendUserLogin(username, password)
-    await login(username, password)
+    login(username, password)
   }
 
   return (
