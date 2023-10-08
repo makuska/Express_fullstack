@@ -18,7 +18,9 @@ function DashHeader() {
         <Link className="active" onClick={handleLogoutButtonCLick} to="/login">Logout</Link>
       </div>
       <div className="header">
-        Hello {user!.username}
+        Hello user {user!.username}
+        <br/>
+        Your email: {user!.email}
       </div>
     </div>
   )

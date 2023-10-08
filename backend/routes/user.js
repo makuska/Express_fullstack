@@ -11,7 +11,7 @@ userRoute.post('/api/auth/signup', [signupSchema, checkDuplicateUsernameOrEmail]
 userRoute.post('/api/auth/signin', loginSchema, authController.login)
 userRoute.get('/isAdmin', [verifyToken, isAdmin], authController.sampleAdminEvent)
 userRoute.get('/isUser', [verifyToken, isUser], authController.sampleUserEvent)
-userRoute.post('/api/auth/newToken', authController.getNewAccessToken)
-userRoute.delete('api/auth/logout', authController.logout)
+userRoute.delete('/api/auth/logout', authController.logout)
+userRoute.get('/api/auth/verifyRefreshToken', authController.verifyRefreshToken)
 
 export default userRoute;

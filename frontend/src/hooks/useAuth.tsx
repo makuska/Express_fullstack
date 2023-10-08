@@ -8,8 +8,7 @@ import React, {
 } from "react";
 import {useNavigate, useLocation, NavigateFunction} from "react-router-dom";
 import {User} from "../types/authTypes.ts";
-import {frontendUserLogin, frontendUserLogout} from "../services/authService.ts";
-import {useLocalStorage} from "./useLocalStorage.ts";
+import {frontendUserLogin, frontendUserLogout, verifyUserRefreshToken} from "../services/authService.ts";
 
 interface AuthContextType {
   user?: User;
@@ -32,29 +31,30 @@ export function AuthProvider({children}: { children: ReactNode }): React.JSX.Ele
 
   const navigate: NavigateFunction = useNavigate();
   const location = useLocation();
-  const {getItem} = useLocalStorage()
 
   // Reset the error state if we change page
   useEffect(() => {
     if (error) setError(undefined);
   }, [location.pathname]);
 
-  // Check if there is a currently active session
+  // Check if there is a currently valid refreshToken
   // when the provider is mounted for the first time.
   //
-  // If there is an error, it means there is no session.
+  // If there is an error, it means there is no valid refreshToken.
   //
-  // Finally, just signal the component that the initial load
-  // is over.
+  // Finally, just signal the component that the initial load is over.
   useEffect(() => {
-    let user: string | null = getItem('user')
-      if(user) {
-        setUser(JSON.parse(user))
-      }
-      else {
-        ((_error: any) => {})
-      }
-      setLoadingInitial(false);
+    verifyUserRefreshToken()
+      .then((response: User | boolean) => {
+        if (response && typeof response !== 'boolean') {
+          setUser(response)
+        }
+        setLoadingInitial(false);
+      })
+      .catch((error) => {
+        console.error("Error while verifying refresh token:", error)
+        setLoadingInitial(false)
+      })
   }, []);
 
   // Flags the component loading state and posts the login

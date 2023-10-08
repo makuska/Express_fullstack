@@ -1,5 +1,5 @@
 import {LoginResponse, User} from "../types/authTypes.ts";
-import {loginEndpoint, logoutEndpoint, registerEndpoint} from "../constants/authEndpoints.ts";
+import {loginEndpoint, logoutEndpoint, registerEndpoint, RTVerificationEndpoint} from "../constants/authEndpoints.ts";
 
 export async function frontendUserLogin(username: string, password: string): Promise<User | null> {
   try {
@@ -70,15 +70,22 @@ export async function frontendUserRegister(username: string, email: string, pass
 
 export async function frontendUserLogout(): Promise<void> {
   // Since every httpOnly cookie is sent with every HTTP request, there is no need to send it manually
+  // TODO logout gives 204 error, user is redirected to the login page but accessToken is not cleared from the localStorage
   try {
     const res: Response = await fetch(logoutEndpoint, {
       method: "DELETE",
       headers: {
-        "Content-type": "application/json; charset=UTF-8"
+        "Content-type": "application/json; charset=UTF-8",
+        // Cookie: `refreshToken=${}`
       }
     })
-    if (res.status === 200) {
+    console.log(res)
+    if (res.ok) {
+      console.log(res)
+      const successData = await res.json()
       localStorage.removeItem("accessToken")
+      localStorage.removeItem("user")
+      return console.log(successData.message)
     } else {
       const errorData = await res.json()
       alert(`Registration error: ${errorData.message}`)
@@ -87,6 +94,26 @@ export async function frontendUserLogout(): Promise<void> {
   } catch (e) {
     console.error("Unable to log out, error: ", e)
   }
+}
+
+export async function verifyUserRefreshToken(): Promise<User | boolean> {
+  try {
+    const res: Response = await fetch(RTVerificationEndpoint, {
+      method: "GET",
+      headers:  {
+        "Content-type": "application/json; charset=UTF-8",
+      }
+    })
+
+    if (res.ok) {
+      const userData: User = await res.json()
+      return userData
+    }
+  } catch (e) {
+    console.error("Unable to verify the refreshToken due to API request to the backend")
+    return false
+  }
+  return false
 }
 
 // const authService = {

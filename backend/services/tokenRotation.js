@@ -1,6 +1,6 @@
 import { configDotenv } from "dotenv";
 import jsonwebtoken from "jsonwebtoken";
-import {checkIfTokenIsRevoked, revokeToken} from "../repository/tokenRepository.js";
+import {checkIfRefreshTokenIsRevoked, revokeToken} from "../repository/tokenRepository.js";
 import {createRefreshToken} from "../utils/tokenUtils.js";
 import {cookieOptions} from "../utils/cookieOptions.js";
 
@@ -22,7 +22,7 @@ export async function rotateRefreshToken(req, res){
             return res.status(401).send({ message: 'Access Denied. Invalid refresh token.' });
         }
 
-        const checkTokenFromDatabase = await checkIfTokenIsRevoked(decodedRefreshToken.token_id)
+        const checkTokenFromDatabase = await checkIfRefreshTokenIsRevoked(decodedRefreshToken.token_id)
         if (checkTokenFromDatabase) {
             // TODO since this was illegitimate use of refreshToken, all refreshTokens should be revoked (even the legitimate one)
             // see pole tglt true, peaks ka comparema IP addresse jne...

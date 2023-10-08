@@ -1,36 +1,49 @@
-import jsonwebtoken, {decode} from 'jsonwebtoken'
+import jsonwebtoken from 'jsonwebtoken'
 import bcrypt from 'bcrypt'
-import {validateUserSignupData} from '../utils/DataValidation.js'
 import db from '../db/conn.mjs'
 import {createAccessToken, createRefreshToken} from "../utils/tokenUtils.js";
 import {cookieOptions} from "../utils/cookieOptions.js";
-import {revokeToken, saveRefreshTokenToCollection} from "../repository/tokenRepository.js";
+import {
+    checkIfRefreshTokenIsRevoked,
+    revokeToken,
+    saveRefreshTokenToCollection
+} from "../repository/tokenRepository.js";
 
 
-export function getNewAccessToken(req, res) {
-    const refreshToken = req.cookies['refreshToken'];
-    if (!refreshToken) {
-        return res.status(401).send({ message: 'Access Denied. No refresh token provided.' });
-    }
+// TODO currently console logs an error when there is no refreshToken, which is wrong since this just means that the user shouldn't be logged in since he doesn't have the session/token
+// TODO There shouldn't be an error displayed in the console
+// Failed to load resource: the server responded with a status of 401 (Unauthorized)
+export async function verifyRefreshToken(req, res) {
+    const refreshToken = req.cookies['refreshToken']
+    // TODO this doesn't work; maybe because the token is undefined?...
+    // TODO maybe this error occurred because I left from an auth route to a NON-auth one?
+    console.log(refreshToken)
+    if (!refreshToken) return res.status(401).send({ message: "Please login again, no verification token provided"})
 
     try {
-        const decodedRefreshToken = jsonwebtoken.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET);
+        const decodedRefreshToken = jsonwebtoken.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET, (err) => {
+            if (err) return res.status(401).send({ message: 'Access Denied. Token is invalid.' });
+        });
 
         const currentTimestamp = Math.floor(Date.now() / 1000); // current time in seconds
         if (decodedRefreshToken.exp && currentTimestamp >= decodedRefreshToken.exp) {
-            return res.status(401).send({ message: 'Access Denied. Refresh token has expired.' });
+            return res.status(401).send({ message: 'Access Denied. Token has expired.' });
         }
 
-        const accessToken = createAccessToken(decodedRefreshToken.id, decodedRefreshToken.role)
+        const checkTokenFromDatabase = await checkIfRefreshTokenIsRevoked(decodedRefreshToken.token_id)
+        if (checkTokenFromDatabase) {
+            return res.status(401).send({ message: 'Access Denied. Token is invalid.' });
+        }
 
-        res
-            .header('Authorization', accessToken)
-            .send(decodedRefreshToken);
-    } catch (error) {
-        return res.status(400).send({ message: 'Invalid refresh token.' });
+        const resUser = {
+            username: decodedRefreshToken.username,
+            email: decodedRefreshToken.email
+        }
+        return res.status(200).send({resUser, message: "RefreshToken verified!"})
+    } catch (e) {
+        return res.status(500).send({ message: `There was an error in the verification of the refreshToken, error: ${e}` });
     }
 }
-
 
 
 export async function signup(req, res) {
@@ -105,12 +118,13 @@ export async function login(req, res) {
 }
 
 export async function logout(req, res) {
-    const refreshTokenFromCookie = req.cookie['refreshToken']
+    const refreshTokenFromCookie = req.cookies['refreshToken']
+    console.log(refreshTokenFromCookie)
     const decodedRefreshToken = jsonwebtoken.verify(refreshTokenFromCookie, process.env.REFRESH_TOKEN_SECRET, (err) => {
         if (err) {
             console.error("Unable to verify the refreshToken for the logout request!")
             res.clearCookie('refreshToken')
-            return res.status(204)
+            return res.status(204).send({ message: "User successfully logged out!"})
         }
     })
 
@@ -120,7 +134,7 @@ export async function logout(req, res) {
 
         if (!foundRT) {
             res.clearCookie('refreshToken')
-            return res.status(204)
+            return res.status(204).send({ message: "User successfully logged out!"})
         }
     } catch (e) {
         return res
@@ -129,6 +143,7 @@ export async function logout(req, res) {
     }
 
     res.clearCookie('refreshToken')
+    return res.status(200).send({ message: "User successfully logged out!"})
 }
 
 export function sampleUserEvent(req, res) {

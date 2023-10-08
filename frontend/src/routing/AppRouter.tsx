@@ -5,6 +5,7 @@ import RegisterPage from "../pages/RegisterPage.tsx";
 import AuthenticatedRoute from "./AuthenticatedRoute.tsx";
 import DashboardPage from "../pages/DashboardPage.tsx";
 import NotFoundPage from "../pages/NotFoundPage.tsx";
+import Footer from "../components/Footer.tsx";
 
 function AppRouter(){
   return (
@@ -26,6 +27,14 @@ function AppRouter(){
         element={
           <AuthenticatedRoute >
             <DashboardPage />
+          </AuthenticatedRoute>
+        }
+      />
+      <Route
+        path="/profile"
+        element={
+          <AuthenticatedRoute >
+            <Footer />
           </AuthenticatedRoute>
         }
       />

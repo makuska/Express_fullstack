@@ -3,7 +3,7 @@ import jsonwebtoken from "jsonwebtoken";
 
 const collectionName = 'BlacklistedTokens'
 
-export async function checkIfTokenIsRevoked(decodedRefreshTokenId) {
+export async function checkIfRefreshTokenIsRevoked(decodedRefreshTokenId) {
     try {
         const token = await db.collection(collectionName).findOne({
             token_id: decodedRefreshTokenId
