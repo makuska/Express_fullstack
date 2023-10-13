@@ -53,6 +53,7 @@ export function verifyToken(req, res, next) {
     }
 }
 
+// TODO Error [ERR_HTTP_HEADERS_SENT]: Cannot set headers after they are sent to the client
 export function isAdmin(req, res, next) {
     if (req.user.role === 'admin') {
         next()

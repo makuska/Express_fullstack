@@ -30,7 +30,11 @@ export async function rotateRefreshToken(req, res){
             return res.status(401).send({ message: 'Access Denied. Refresh token has been revoked. Please log in again!' })
         }
 
-        await revokeToken(decodedRefreshToken, clientIP)
+        const result = revokeToken(decodedRefreshToken, clientIP);
+        if (typeof result === 'string') {
+            console.error(result);
+            return res.status(500).send({ message: result }); //send error as response to the client
+        }
 
         // TODO ilmselt peaks ka uue accessTokeni looma ja clinetile need tagastama vastavalt (headeris ja cookiena)
         const newRefreshToken = createRefreshToken(decodedRefreshToken.id, decodedRefreshToken.role)

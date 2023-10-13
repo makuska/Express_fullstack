@@ -2,6 +2,7 @@ import db from '../db/conn.mjs'
 import jsonwebtoken from "jsonwebtoken";
 
 const collectionName = 'BlacklistedTokens'
+// TODO think whether its good practice or not to throw an error in the catch block...
 
 export async function checkIfRefreshTokenIsRevoked(decodedRefreshTokenId) {
     try {
@@ -9,7 +10,7 @@ export async function checkIfRefreshTokenIsRevoked(decodedRefreshTokenId) {
             token_id: decodedRefreshTokenId
         }, (err) => {
             if (err) {
-                throw new Error(`Error occurred when searching for the token from the database, error message: ${err}`)
+                return (`Error occurred when searching for the token from the database, error message: ${err}`)
             }
         })
         if (!token.isValid) return token
@@ -51,7 +52,7 @@ export async function saveRefreshTokenToCollection(refreshToken, clientIP) {
             isValid: true
         }, (err) => {
             if (err) {
-                throw new Error(`Error occurred when saving the refreshToken to the database, error message: ${err}`)
+                return (`Error occurred when saving the refreshToken to the database, error message: ${err}`)
             }
         })
     } catch (e) {

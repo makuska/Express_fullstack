@@ -9,7 +9,7 @@ import {
     saveRefreshTokenToCollection
 } from "../repository/tokenRepository.js";
 
-// The browser's console logs this as an error because most modern browsers log 400-599 statuses as an erro.
+// The browser's console logs this as an error because most modern browsers log 400-599 statuses as an error.
 export async function verifyRefreshToken(req, res) {
     const refreshToken = req.cookies['refreshToken']
     console.log("(18:5) - refreshToken inside the verifyRefreshToken function: ",refreshToken)
@@ -24,9 +24,11 @@ export async function verifyRefreshToken(req, res) {
             return res.status(401).send({ message: 'Access Denied. Token has expired.' });
         }
 
-        const checkTokenFromDatabase = await checkIfRefreshTokenIsRevoked(decodedRefreshToken.token_id)
-        if (checkTokenFromDatabase) {
+        const result = await checkIfRefreshTokenIsRevoked(decodedRefreshToken.token_id)
+        if (result) {
             return res.status(401).send({ message: 'Access Denied. Token is invalid.' });
+        } else if (typeof result === 'string') {
+            return res.status(500).send({ message: result })
         }
 
         const resUser = {
@@ -89,7 +91,10 @@ export async function login(req, res) {
 
         // save refreshToken to the database
         const clientIP = req.ip
-        await saveRefreshTokenToCollection(refreshToken, clientIP)
+        const result = await saveRefreshTokenToCollection(refreshToken, clientIP)
+        if (typeof result === 'string') {
+            res.status(500).send({ message: result })
+        }
 
         const resUser = {
             username: user.username,
@@ -115,28 +120,27 @@ export async function login(req, res) {
 export async function logout(req, res) {
     const refreshTokenFromCookie = req.cookies['refreshToken']
     if (!refreshTokenFromCookie) return res.status(204).send()
-    console.log("(121:5) - refreshToken when logout function is called: ",refreshTokenFromCookie)
+
     const decodedRefreshToken = jsonwebtoken.verify(refreshTokenFromCookie, process.env.REFRESH_TOKEN_SECRET)
     if (!decodedRefreshToken) {
         console.error("Unable to verify the refreshToken for the logout request!")
-        res.clearCookie('refreshToken')
-        // TODO maybe it needs to send the status
+        res.clearCookie('refreshToken', { expires: new Date(0) });
         return res.status(204).send()
     }
 
     // Check if the refreshToken is in the database
     try {
-        console.log("(131:9) - decodedRefreshToken value",decodedRefreshToken)
-        await revokeToken(decodedRefreshToken, req.ip)
-        console.log("(133:9) - Trying to clear the cookie")
-        console.log("req.cookies: ",req.cookies)
-        console.log("res.cookies: ",res.cookies)
-        res.clearCookie('refreshToken')
-        console.log("(135:9)", res.cookies)
+        const result = await revokeToken(decodedRefreshToken, req.ip)
+        if (typeof result === 'string') {
+            console.error(result);
+            return res.status(500).send({ message: result }); //send error as response to the client
+        }
+
+        res.clearCookie('refreshToken', { expires: new Date(0) });
         return res.status(204).send()
     } catch (e) {
         return res
-            .clearCookie('refreshToken')
+            .clearCookie('refreshToken', { expires: new Date(0) })
             .status(500)
             .send({ message: "error", e})
     }
