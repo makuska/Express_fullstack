@@ -26,13 +26,13 @@ export async function revokeToken(decodedRefreshToken, clientIP) {
             {
                 $set: {
                     isValid: false,
-                    revokedTokenClientIP: clientIP // Add the new field and set it to clientIP
+                    revokedTokenClientIP: clientIP // Adds the new field and set it to clientIP
                 }
             },
-            { upsert: false } // Use upsert option to insert or update
+            { upsert: true } // Use upsert option to insert or update
         , (err) => {
             if (err) {
-                throw new Error(`Error occurred when updating the refreshToken in the database, error message: ${err}`)
+                return (`Error occurred when updating the refreshToken in the database, error message: ${err}`)
             }
         });
     } catch (e) {

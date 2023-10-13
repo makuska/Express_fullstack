@@ -25,11 +25,19 @@ function AppRouter(){
       <Route
         path="/dashboard"
         element={
-          <AuthenticatedRoute >
+          <AuthenticatedRoute>
             <DashboardPage />
           </AuthenticatedRoute>
         }
       />
+      {/*<AuthenticatedRoute*/}
+      {/*  path="/dashboard"*/}
+      {/*  element={DashboardPage}*/}
+      {/*/>*/}
+      {/*<AuthenticatedRoute*/}
+      {/*  path="/profile"*/}
+      {/*  element={Footer}*/}
+      {/*/>*/}
       <Route
         path="/profile"
         element={

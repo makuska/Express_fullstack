@@ -9,6 +9,7 @@ import React, {
 import {useNavigate, useLocation, NavigateFunction} from "react-router-dom";
 import {User} from "../types/authTypes.ts";
 import {frontendUserLogin, frontendUserLogout, verifyUserRefreshToken} from "../services/authService.ts";
+import {getUserDataById} from "../services/userService.ts";
 
 interface AuthContextType {
   user?: User;
@@ -45,9 +46,18 @@ export function AuthProvider({children}: { children: ReactNode }): React.JSX.Ele
   // Finally, just signal the component that the initial load is over.
   useEffect(() => {
     verifyUserRefreshToken()
-      .then((response: User | boolean) => {
+      .then((response: { userId: string; role: string } | boolean | undefined) => {
         if (response && typeof response !== 'boolean') {
-          setUser(response)
+          // this is only necessary since the token doesn't contain the users username and email value, should be replaced in the future lol
+          getUserDataById(response.userId!)
+            .then(res => {
+              if (res) {
+                setUser(res)
+              }
+            })
+        }
+        if (typeof response === null) {
+          setUser(undefined)
         }
         setLoadingInitial(false);
       })
@@ -73,6 +83,7 @@ export function AuthProvider({children}: { children: ReactNode }): React.JSX.Ele
         if (resUser) {
           // console.log(resUser)
           setUser(resUser);
+          console.log(user)
           navigate("/dashboard");
         } else {
           setError("Login failed. Please check your credentials.");

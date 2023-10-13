@@ -1,4 +1,5 @@
 import * as authController from '../controllers/auth.controller.js'
+import * as userController from '../controllers/user.controller.js'
 import { checkDuplicateUsernameOrEmail } from '../middleware/verifySignup.mjs'
 import {Router} from "express";
 import {signupSchema} from "../schemas/signupSchema.js";
@@ -13,5 +14,6 @@ userRoute.get('/isAdmin', [verifyToken, isAdmin], authController.sampleAdminEven
 userRoute.get('/isUser', [verifyToken, isUser], authController.sampleUserEvent)
 userRoute.delete('/api/auth/logout', authController.logout)
 userRoute.get('/api/auth/verifyRefreshToken', authController.verifyRefreshToken)
+userRoute.get('/api/user/:userId', userController.getUserDetailsById)
 
 export default userRoute;

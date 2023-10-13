@@ -7,8 +7,18 @@ export interface LoginResponse {
 export interface User {
   username: string;
   email: string;
-  authToken?: string;
+  userId?: string
+  role?: string
 }
+
+export interface RefreshTokenResponse {
+  resUser?: {
+    userId: string;
+    role: string;
+  };
+  message: string;
+}
+
 
 export interface AuthContextType {
   user: User | null;

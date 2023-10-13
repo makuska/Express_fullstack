@@ -21,7 +21,8 @@ app.use(express.urlencoded({extended: false}));
 app.use(express.json());
 app.use(cookieParser())
 app.use(cors({
-  origin: `http://localhost:${process.env.FRONTEND_PORT}`
+  origin: `http://localhost:${process.env.FRONTEND_PORT}`,
+  credentials: true
 }));
 
 const dbName = 'Database';

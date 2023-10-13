@@ -1,4 +1,4 @@
-import {LoginResponse, User} from "../types/authTypes.ts";
+import {LoginResponse, RefreshTokenResponse, User} from "../types/authTypes.ts";
 import {loginEndpoint, logoutEndpoint, registerEndpoint, RTVerificationEndpoint} from "../constants/authEndpoints.ts";
 
 export async function frontendUserLogin(username: string, password: string): Promise<User | null> {
@@ -70,45 +70,50 @@ export async function frontendUserRegister(username: string, email: string, pass
 
 export async function frontendUserLogout(): Promise<void> {
   // Since every httpOnly cookie is sent with every HTTP request, there is no need to send it manually
-  // TODO logout gives 204 error, user is redirected to the login page but accessToken is not cleared from the localStorage
   try {
     const res: Response = await fetch(logoutEndpoint, {
       method: "DELETE",
+      credentials: "include",
       headers: {
-        "Content-type": "application/json; charset=UTF-8",
-        // Cookie: `refreshToken=${}`
-      }
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+      },
     })
-    console.log(res)
     if (res.ok) {
-      console.log(res)
-      const successData = await res.json()
+      // console.log("(85:7) - revoking the token was successful")
       localStorage.removeItem("accessToken")
       localStorage.removeItem("user")
-      return console.log(successData.message)
+      return
     } else {
       const errorData = await res.json()
-      alert(`Registration error: ${errorData.message}`)
-      return console.error(`Registration error: ${errorData.message}`)
+      return console.error(`Logout error: ${errorData.message}`)
     }
   } catch (e) {
-    console.error("Unable to log out, error: ", e)
+    return console.error("Unable to log out, error: ", e)
   }
 }
 
-export async function verifyUserRefreshToken(): Promise<User | boolean> {
+export async function verifyUserRefreshToken(): Promise<{ userId: string; role: string } | boolean | undefined> {
   try {
     const res: Response = await fetch(RTVerificationEndpoint, {
       method: "GET",
-      headers:  {
-        "Content-type": "application/json; charset=UTF-8",
-      }
+      credentials: "include",
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+      },
+      // credentials: "include"
     })
-
     if (res.ok) {
-      const userData: User = await res.json()
-      return userData
+      const userData: RefreshTokenResponse = await res.json()
+      // Since the res.status is 200 it will return resUser
+      return userData.resUser!
     }
+    if (res.status === 401) {
+      console.log('hello')
+      return undefined
+    }
+
   } catch (e) {
     console.error("Unable to verify the refreshToken due to API request to the backend")
     return false

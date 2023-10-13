@@ -9,21 +9,15 @@ import {
     saveRefreshTokenToCollection
 } from "../repository/tokenRepository.js";
 
-
-// TODO currently console logs an error when there is no refreshToken, which is wrong since this just means that the user shouldn't be logged in since he doesn't have the session/token
-// TODO There shouldn't be an error displayed in the console
-// Failed to load resource: the server responded with a status of 401 (Unauthorized)
+// The browser's console logs this as an error because most modern browsers log 400-599 statuses as an erro.
 export async function verifyRefreshToken(req, res) {
     const refreshToken = req.cookies['refreshToken']
-    // TODO this doesn't work; maybe because the token is undefined?...
-    // TODO maybe this error occurred because I left from an auth route to a NON-auth one?
-    console.log(refreshToken)
+    console.log("(18:5) - refreshToken inside the verifyRefreshToken function: ",refreshToken)
     if (!refreshToken) return res.status(401).send({ message: "Please login again, no verification token provided"})
 
     try {
-        const decodedRefreshToken = jsonwebtoken.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET, (err) => {
-            if (err) return res.status(401).send({ message: 'Access Denied. Token is invalid.' });
-        });
+        const decodedRefreshToken = jsonwebtoken.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET);
+        if (!decodedRefreshToken) return res.status(401).send({ message: 'Access Denied. Token is invalid.' });
 
         const currentTimestamp = Math.floor(Date.now() / 1000); // current time in seconds
         if (decodedRefreshToken.exp && currentTimestamp >= decodedRefreshToken.exp) {
@@ -36,8 +30,8 @@ export async function verifyRefreshToken(req, res) {
         }
 
         const resUser = {
-            username: decodedRefreshToken.username,
-            email: decodedRefreshToken.email
+            userId: decodedRefreshToken.id,
+            role: decodedRefreshToken.role
         }
         return res.status(200).send({resUser, message: "RefreshToken verified!"})
     } catch (e) {
@@ -100,7 +94,8 @@ export async function login(req, res) {
         const resUser = {
             username: user.username,
             email: user.email,
-            accessToken: accessToken
+            userId: user._id,
+            role: user.role
         }
 
         res
@@ -119,31 +114,32 @@ export async function login(req, res) {
 
 export async function logout(req, res) {
     const refreshTokenFromCookie = req.cookies['refreshToken']
-    console.log(refreshTokenFromCookie)
-    const decodedRefreshToken = jsonwebtoken.verify(refreshTokenFromCookie, process.env.REFRESH_TOKEN_SECRET, (err) => {
-        if (err) {
-            console.error("Unable to verify the refreshToken for the logout request!")
-            res.clearCookie('refreshToken')
-            return res.status(204).send({ message: "User successfully logged out!"})
-        }
-    })
+    if (!refreshTokenFromCookie) return res.status(204).send()
+    console.log("(121:5) - refreshToken when logout function is called: ",refreshTokenFromCookie)
+    const decodedRefreshToken = jsonwebtoken.verify(refreshTokenFromCookie, process.env.REFRESH_TOKEN_SECRET)
+    if (!decodedRefreshToken) {
+        console.error("Unable to verify the refreshToken for the logout request!")
+        res.clearCookie('refreshToken')
+        // TODO maybe it needs to send the status
+        return res.status(204).send()
+    }
 
     // Check if the refreshToken is in the database
     try {
-        const foundRT = await revokeToken(decodedRefreshToken, req.ip)
-
-        if (!foundRT) {
-            res.clearCookie('refreshToken')
-            return res.status(204).send({ message: "User successfully logged out!"})
-        }
+        console.log("(131:9) - decodedRefreshToken value",decodedRefreshToken)
+        await revokeToken(decodedRefreshToken, req.ip)
+        console.log("(133:9) - Trying to clear the cookie")
+        console.log("req.cookies: ",req.cookies)
+        console.log("res.cookies: ",res.cookies)
+        res.clearCookie('refreshToken')
+        console.log("(135:9)", res.cookies)
+        return res.status(204).send()
     } catch (e) {
         return res
+            .clearCookie('refreshToken')
             .status(500)
             .send({ message: "error", e})
     }
-
-    res.clearCookie('refreshToken')
-    return res.status(200).send({ message: "User successfully logged out!"})
 }
 
 export function sampleUserEvent(req, res) {
