@@ -1,4 +1,4 @@
-import db from "../db/conn.mjs";
+import db from "../db/conn.js";
 import {ObjectId} from "mongodb";
 
 const collectionName = 'User'

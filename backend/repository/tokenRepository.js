@@ -1,4 +1,4 @@
-import db from '../db/conn.mjs'
+import db from '../db/conn.js'
 import jsonwebtoken from "jsonwebtoken";
 
 const collectionName = 'BlacklistedTokens'

@@ -11,4 +11,4 @@ COPY . /app
 
 EXPOSE 8080
 
-CMD ["node","index.mjs"]
+CMD ["node","server.js"]

@@ -1,6 +1,6 @@
 import jsonwebtoken from 'jsonwebtoken'
 import bcrypt from 'bcrypt'
-import db from '../db/conn.mjs'
+import db from '../db/conn.js'
 import {createAccessToken, createRefreshToken} from "../utils/tokenUtils.js";
 import {cookieOptions} from "../utils/cookieOptions.js";
 import {

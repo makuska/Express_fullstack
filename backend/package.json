@@ -2,11 +2,11 @@
   "name": "backend",
   "version": "1.0.0",
   "description": "The backend built in Express",
-  "exports": "./index.js",
+  "exports": "./server.js",
   "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "nodemon index.mjs"
+    "start": "nodemon server.js"
   },
   "author": "Stefan Vilceloiu",
   "license": "ISC",
@@ -19,7 +19,7 @@
     "express": "^4.18.2",
     "joi": "^17.10.1",
     "jsonwebtoken": "^9.0.2",
-    "mongoose": "^7.0.2",
+    "mongodb": "^6.1.0",
     "nodemon": "^2.0.22",
     "swagger-jsdoc": "^6.2.8",
     "swagger-ui-express": "^5.0.0"

@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { config as dotenvConfig } from "dotenv";
-import db from '../db/conn.mjs'
+import db from '../db/conn.js'
 import { validatePostData } from "../utils/DataValidation.js";
 
 const postsRouter = Router()
