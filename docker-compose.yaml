@@ -35,27 +35,27 @@ services:
     depends_on:
       - mymongodb
 
-#  # name is optional for our frontend
-#  frontend:
-#    # to build an image based on Dockerfile
-#    # it looks in this folder to find Dockerfile to build an image
-#    build: ./frontend
-#
-#    # the port that we want to publish for frontend
-#    ports:
-#      - "5173:5173"
-#    environment:
-#      - PORT=5173
-#    # add bind mount volume to keep have updated source code
-#    volumes:
-#      - ./frontend/src:/app/src
-#    # allow interactive mode
-#    stdin_open: true
-#    tty: true
-#
-#    # it will start our frontend container once backend-container is  up and running.
-#    depends_on:
-#      - backend
+  # name is optional for our frontend
+  frontend:
+    # to build an image based on Dockerfile
+    # it looks in this folder to find Dockerfile to build an image
+    build: ./frontend
+
+    # the port that we want to publish for frontend
+    ports:
+      - "5173:5173"
+    environment:
+      - PORT=5173
+    # add bind mount volume to keep have updated source code
+    volumes:
+      - ./frontend/src:/app/src
+    # allow interactive mode
+    stdin_open: true
+    tty: true
+
+    # it will start our frontend container once backend-container is  up and running.
+    depends_on:
+      - backend
 
 # declare the volumes name that our app is using.
 volumes:
