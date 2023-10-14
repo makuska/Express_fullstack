@@ -1,47 +1,54 @@
 import { configDotenv } from "dotenv";
-import jsonwebtoken from "jsonwebtoken";
 import {checkIfRefreshTokenIsRevoked, revokeToken} from "../repository/tokenRepository.js";
-import {createRefreshToken} from "../utils/tokenUtils.js";
-import {cookieOptions} from "../utils/cookieOptions.js";
+import jsonwebtoken from "jsonwebtoken";
 
 
 configDotenv()
 
 const {REFRESH_TOKEN_SECRET} = process.env
 
-export async function rotateRefreshToken(req, res){
-    if (!req.cookies['refreshToken']) return res.status(401).send({ message: "Access Denied. No refresh token provided." })
+export async function rotateRefreshToken(req) {
+    const result = {
+        status: 200,
+        error: null
+    };
 
-    const refreshToken = req.cookies['refreshToken']
+    const refreshToken = req.cookies['refreshToken'];
     const clientIP = req.ip
 
+    if (!refreshToken) {
+        result.status = 401;
+        result.error = 'Access Denied. No refresh token provided';
+        return result;
+    }
+
     try {
-        const decodedRefreshToken = await jsonwebtoken.verify(refreshToken, REFRESH_TOKEN_SECRET)
+        const decodedRefreshToken = await jsonwebtoken.verify(refreshToken, REFRESH_TOKEN_SECRET);
 
         if (!decodedRefreshToken || !decodedRefreshToken.id || !decodedRefreshToken.role || !decodedRefreshToken.token_id) {
-            return res.status(401).send({ message: 'Access Denied. Invalid refresh token.' });
+            result.status = 401;
+            result.error = 'Access Denied. Invalid refresh token';
+        } else {
+            const checkTokenFromDatabase = await checkIfRefreshTokenIsRevoked(decodedRefreshToken.token_id);
+
+            if (checkTokenFromDatabase) {
+                result.status = 401;
+                result.error = 'Access Denied. Refresh token has been revoked. Please log in again.';
+                console.info(`Unauthorized access attempt from IP: ${clientIP}`);
+            } else {
+                const revokeResult = await revokeToken(decodedRefreshToken, clientIP);
+
+                if (typeof revokeResult === 'string') {
+                    result.status = 500;
+                    result.error = revokeResult;
+                }
+            }
         }
-
-        const checkTokenFromDatabase = await checkIfRefreshTokenIsRevoked(decodedRefreshToken.token_id)
-        if (checkTokenFromDatabase) {
-            // TODO since this was illegitimate use of refreshToken, all refreshTokens should be revoked (even the legitimate one)
-            // see pole tglt true, peaks ka comparema IP addresse jne...
-            console.info(`Unauthorized access attempt from IP: ${clientIP}`)
-            return res.status(401).send({ message: 'Access Denied. Refresh token has been revoked. Please log in again!' })
-        }
-
-        const result = revokeToken(decodedRefreshToken, clientIP);
-        if (typeof result === 'string') {
-            console.error(result);
-            return res.status(500).send({ message: result }); //send error as response to the client
-        }
-
-        // TODO ilmselt peaks ka uue accessTokeni looma ja clinetile need tagastama vastavalt (headeris ja cookiena)
-        const newRefreshToken = createRefreshToken(decodedRefreshToken.id, decodedRefreshToken.role)
-
-        res.cookie('refreshToken', newRefreshToken, cookieOptions);
     } catch (err) {
+        result.status = 400;
+        result.error = 'Unable to verify the refresh token';
         console.error('Error while rotating refresh token:', err);
-        return res.status(400).send({ message: 'Unable to verify the refresh token', error: err });
     }
+
+    return result;
 }

@@ -3,6 +3,7 @@ import jsonwebtoken from "jsonwebtoken";
 
 const collectionName = 'BlacklistedTokens'
 // TODO think whether its good practice or not to throw an error in the catch block...
+// TODO Also unit tests would be great to test the (err) functionality
 
 export async function checkIfRefreshTokenIsRevoked(decodedRefreshTokenId) {
     try {
