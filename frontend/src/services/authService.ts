@@ -110,7 +110,6 @@ export async function verifyUserRefreshToken(): Promise<{ userId: string; role: 
       return userData.resUser!
     }
     if (res.status === 401) {
-      console.log('hello')
       return undefined
     }
 
