@@ -19,7 +19,7 @@ jobs:
     runs-on: ubuntu-latest
 
     # Steps represent a sequence of tasks that will be executed as part of the job
-    # Each job in a workflow runs in a fresh vritual environment managed by Github.
+    # Each job in a workflow runs in a fresh virtual environment managed by Github.
     steps:
       # Checks-out to the Github's predefined/pre-created actions directory, where all the actions are 'hosted'
       - name: Checkout code
@@ -29,22 +29,20 @@ jobs:
       # Runs a single command using the runners shell
       - name: Build Docker images
         shell: bash
-        # pipe "|" is a multi-line syntax/cmd in yml
+        # pipe "|" is a multi-line syntax/cmd in YAML
         run: |
           echo ---Building and starting up docker---
           docker-compose up --build -d
-      
-     - name: Check if backend is running
+
+      - name: Check if backend is running
         run: |
           # Function to check whether backend (last container which depends on the mongodb) is up and running
           check_backend_log_message() {
             docker logs docker_mongo_react_express-backend-1 2>&1 | grep "Server listening on port 8080"
           }
-
           while [[ -z "$(check_backend_log_message)" ]]; do
             sleep 2
           done
-
           echo ---Backend is up and running---
 
       - name: Check Running Images
@@ -53,16 +51,13 @@ jobs:
           count_running_containers() {
             docker ps -q | wc -l
           }
-
-          # Expected amout of containers running
+          # Expected amount of containers running
           expected_containers=3
-
-          while [[ "$(count_running_containers)" -lt "$(expected_containers)" ]]; do
+          while [[ "$(count_running_containers)" -lt "$expected_containers)" ]]; do
             sleep 2
           done
-
           echo ---Containers up and running---
-          
+
       # Runs a set of commands using the runners shell
       # - name: Run a multi-line script
       #   run: |
