@@ -33,10 +33,34 @@ jobs:
         run: |
           echo ---Building and starting up docker---
           docker-compose up --build -d
-          
+      
+     - name: Check if backend is running
+        run: |
+          # Function to check whether backend (last container which depends on the mongodb) is up and running
+          check_backend_log_message() {
+            docker logs docker_mongo_react_express-backend-1 2>&1 | grep "Server listening on port 8080"
+          }
+
+          while [[ -z "$(check_backend_log_message)" ]]; do
+            sleep 2
+          done
+
+          echo ---Backend is up and running---
+
       - name: Check Running Images
         run: |
-          docker ps
+          # Function to check whether all containers are up and running
+          count_running_containers() {
+            docker ps -q | wc -l
+          }
+
+          # Expected amout of containers running
+          expected_containers=3
+
+          while [[ "$(count_running_containers)" -lt "$(expected_containers)" ]]; do
+            sleep 2
+          done
+
           echo ---Containers up and running---
           
       # Runs a set of commands using the runners shell
