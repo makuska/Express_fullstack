@@ -31,7 +31,7 @@ export async function rotateRefreshToken(req) {
         } else {
             const checkTokenFromDatabase = await checkIfRefreshTokenIsRevoked(decodedRefreshToken.token_id);
 
-            if (checkTokenFromDatabase) {
+            if (checkTokenFromDatabase || checkTokenFromDatabase === null) {
                 result.status = 401;
                 result.error = 'Access Denied. Refresh token has been revoked. Please log in again.';
                 console.info(`Unauthorized access attempt from IP: ${clientIP}`);

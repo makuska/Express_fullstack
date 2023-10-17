@@ -35,6 +35,23 @@ describe('POST auth requests', () => {
     }, 1000)
   })
 
+  // Insert a test user, which will be used for testing
+  async function returnTestUser() {
+    const mockUser = {
+      username: 'testUsername',
+      email: 'test@email.com',
+      role: 'user',
+      password: '@TestingPassword123'
+    }
+
+    const result = await db.collection('User').insertOne(mockUser)
+    if (result.insertedId) {
+      return mockUser
+    } else {
+      throw Error("Unable to insert a test user to the database!")
+    }
+  }
+
   describe("POST /api/auth/signin", () => {
     it('should insert a user into collection', async () => {
       const mockUser = {
@@ -47,21 +64,20 @@ describe('POST auth requests', () => {
       const response = await fetch(`${baseURL}/api/auth/signup`, {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json', // Set the content type
+          'Content-Type': 'application/json'
         },
-        body: JSON.stringify(mockUser), // Convert your user object to a JSON string
+        body: JSON.stringify(mockUser)
       });
 
       expect(response.status).toBe(201)
     });
-  })
 
-  // TODO should use another user, because this test depends on the first test.
-  describe("POST /api/auth/signin", () => {
+    
     it('should return resUser, accessToken and refreshToken', async () => {
-      const mockUser = {
-        username: 'testUsername',
-        password: '@TestingPassword123'
+      const mockUser = await returnTestUser()
+      const validUser = {
+        username: mockUser.username,
+        password: mockUser.password
       }
 
       const response = await fetch(`${baseURL}/api/auth/signin`, {
@@ -69,10 +85,11 @@ describe('POST auth requests', () => {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(mockUser),
+        body: JSON.stringify(validUser),
       })
 
       expect(response.status).toBe(200)
+      expect(response.headers).toHaveProperty('Auhtorization')
 
       const responseBody = await response.json()
       expect(responseBody).toHaveProperty('resUser')
@@ -90,9 +107,8 @@ describe('POST auth requests', () => {
       expect(responseBody.accessToken).toMatch(/^eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9/)
       expect(responseBody.refreshToken).toMatch(/^eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9/)
     });
-  })
 
-  describe("POST /api/auth/signin", () => {
+    
     it('should fail the signUp schema', async () => {
       const mockUser = {
         username: 'testUsername',
@@ -104,16 +120,50 @@ describe('POST auth requests', () => {
       const response = await fetch(`${baseURL}/api/auth/signup`, {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json', // Set the content type
+          'Content-Type': 'application/json',
         },
-        body: JSON.stringify(mockUser), // Convert your user object to a JSON string
+        body: JSON.stringify(mockUser)
       });
 
       expect(response.status).toBe(422)
     });
   })
 
+  describe('GET /isUser', () => {
+    it('should return user protected resources', async () => {
+      const mockUser = await returnTestUser()
+      const validUser = {
+        username: mockUser.username,
+        password: mockUser.password
+      }
+
+      const response = await fetch(`${baseURL}/api/auth/signin`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(validUser),
+      })
+
+      if (response.status === 200) {
+        const res = await fetch(`${baseURL}/isUser`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          }
+        })
+
+        expect(res.status).toBe(200)
+        const responseBody = await res.json()
+        expect(Array.isArray(responseBody)).toBe(true)
+        expect(responseBody[0]).toHaveProperty('_id')
+        expect(responseBody[0]).toHaveProperty('name')
+        expect(responseBody[0]).toHaveProperty('description')
+        expect(responseBody[0]).toHaveProperty('date')
+      }
+      expect(response.status).toBe(200)
+
+    });
+  });
+
 })
-
-
-

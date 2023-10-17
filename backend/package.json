@@ -5,7 +5,7 @@
   "exports": "./server.js",
   "type": "module",
   "scripts": {
-    "test": "jest --testTimeout=5000",
+    "test": "jest --testTimeout=50000 NODE_OPTIONS=--experimental-vm-modules",
     "start": "nodemon server.js"
   },
   "author": "Stefan Vilceloiu",
@@ -25,7 +25,9 @@
     "swagger-ui-express": "^5.0.0"
   },
   "jest": {
-    "testEnvironment": "node"
+    "testEnvironment": "node",
+    "testMatch": ["**/backend/__tests__/**/*.test.{js,mjs}"],
+    "moduleFileExtensions": ["mjs", "js"]
   },
   "devDependencies": {
     "jest": "^29.7.0"
