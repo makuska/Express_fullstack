@@ -14,8 +14,8 @@ describe('insert', () => {
   }
 
   beforeAll(async () => {
-    connection = await MongoClient.connect(MONGO_URI);
-    db = await connection.db(MONGO_URI);
+    connection = await MongoClient.connect(MONGO_URI)
+    db = await connection.db(MONGO_URI)
   });
 
   afterAll(async () => {

@@ -27,13 +27,13 @@ describe('POST auth requests', () => {
     await db.collection('User').deleteMany({ _id: {$gt: startTime} })
   }
 
-  afterAll(() => {
+  afterAll(async () => {
     // timeout of 1sec just in case
-    setTimeout(async () => {
-      await cleanUpDatabase()
-        .then(() => {console.log("Test data cleared from the Database")})
-    }, 1000)
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    await cleanUpDatabase();
+    console.log("Test data cleared from the Database");
   })
+
 
   // Insert a test user, which will be used for testing
   async function returnTestUser() {

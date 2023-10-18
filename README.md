@@ -123,3 +123,6 @@ I can give you 2 example use-cases where I did multi-threading recently (#1 is u
 Client UI calls a search API; backend master thread spawn 4 child threads to call 4 different search provider in parallel, which will return the search results from different modules; when all 4 threads are completed, master thread will combine the search results and respond back to frontend.
 
 Client UI uploads an excel file for importing data; backend master thread stores the file, spawn a child thread to process the file data, then immediately returns a response to UI without waiting for the file to be fully processed. The child thread will continue to process the file into the DB in the background.
+
+### Docker directories (Build context and WORKDIR)
+https://stackoverflow.com/a/58434551

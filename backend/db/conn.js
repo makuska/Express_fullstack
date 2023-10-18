@@ -18,11 +18,6 @@ let db = conn.db('Database')
 
 export default db
 
-// import { MongoClient } from "mongodb"
-// import { configDotenv } from "dotenv"
-//
-// configDotenv()
-//
 // const connectionString = process.env.MONGO_URI
 //
 // const client = new MongoClient(connectionString, {
@@ -42,6 +37,7 @@ export default db
 //     }
 // }
 //
-// initialize()
+// initialize().then(() => {
+//     console.log("Database initialized")})
 //
 // export default db
