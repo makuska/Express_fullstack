@@ -35,11 +35,17 @@
     "moduleNameMapper": {
       "^(\\.{1,2}/.*)\\.js$": "$1"
     },
-    "transformIgnorePatterns": []
+    "transformIgnorePatterns": [],
+    "globalSetup": "/Users/sander/Desktop/docker_mongo_react_express/backend/__tests__/globalSetup.js",
+    "globalTeardown": "/Users/sander/Desktop/docker_mongo_react_express/backend/__tests__/globalTeardown.js",
+    "setupFilesAfterEnv": [
+      "/Users/sander/Desktop/docker_mongo_react_express/backend/__tests__/setupFile.js"
+    ]
   },
   "devDependencies": {
     "@babel/preset-env": "^7.23.2",
     "babel-jest": "^29.7.0",
-    "jest": "^29.7.0"
+    "jest": "^29.7.0",
+    "mongodb-memory-server": "^9.0.1"
   }
 }
