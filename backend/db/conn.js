@@ -5,7 +5,7 @@ configDotenv()
 
 const connectionString = process.env.MONGO_URI;
 
-const client = new MongoClient(connectionString, {useNewUrlParser: true, useUnifiedTopology: true});
+const client = new MongoClient(connectionString);
 let conn;
 
 try {
