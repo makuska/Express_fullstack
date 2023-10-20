@@ -9,7 +9,7 @@ end=$((SECONDS+duration))
 
 # Start Docker Compose
 echo "---Building and starting up docker---"
-docker compose up --build -d
+CI=true docker compose up --build -d
 
 # Function to check whether the backend is up and running
 check_backend_log_message() {
@@ -35,7 +35,7 @@ count_running_containers() {
 }
 
 # Expected number of containers running
-expected_containers=3
+expected_containers=4
 # Redefine the 'end' variable for the second while loop
 duration2=30
 end=$((SECONDS+duration2))
@@ -54,5 +54,3 @@ else
 fi
 
 echo "---Everything worked, have a nice day :)---"
-# Stop Docker Compose
-docker compose down
