@@ -34,3 +34,5 @@ app.use(authRoute)
 app.listen(process.env.BACKEND_PORT, () => {
   console.info('Server listening on port ' + process.env.BACKEND_PORT);
 });
+
+export default app

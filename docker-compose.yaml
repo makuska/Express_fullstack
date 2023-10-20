@@ -35,6 +35,27 @@ services:
     depends_on:
       - mymongodb
 
+  #  In a typical Docker Compose setup, containers can communicate with each other using service names or container names.
+  #  Using localhost to reference another service running in a separate container won't work because each container
+  #  has its own network stack, and localhost refers to the network stack of the container itself.
+  #
+  #  If you want to access the backend service from the backend-tests container using a name like localhost,
+  #  you can't do this directly. However, you can modify your test configuration to use the service name,
+  #  which is how containers in the same network communicate with each other.
+  backend-tests:
+      build: ./backend
+      command:
+        - /bin/sh
+        - -c
+        - |
+          ls -R __tests__
+          npm run test
+      working_dir: /app
+      depends_on:
+        - mymongodb
+        - backend
+
+
   # name is optional for our frontend
   frontend:
     # to build an image based on Dockerfile
