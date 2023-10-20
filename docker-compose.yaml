@@ -45,11 +45,16 @@ services:
   backend-tests:
       build: ./backend
       command:
+        # if `docker compose` cmd has `CI` variable set to `true`, it'll run this container, otherwise it'll ignore it.
         - /bin/sh
         - -c
         - |
-          ls -R __tests__
-          npm run test
+          if [ "$CI" = "true" ]; then
+            ls -R __tests__
+            npm run test
+          else
+            echo "Tests skipped in non-CI environment."
+          fi
       working_dir: /app
       depends_on:
         - mymongodb
