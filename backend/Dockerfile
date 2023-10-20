@@ -1,4 +1,4 @@
-FROM node
+FROM node:20.8.1
 
 WORKDIR /app
 
@@ -10,4 +10,4 @@ COPY . /app
 
 EXPOSE 8080
 
-CMD ["node","server.js"]
+CMD ["node","--trace-deprecation","server.js"]

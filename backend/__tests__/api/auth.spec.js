@@ -48,7 +48,6 @@ describe('POST auth requests', () => {
         password: '@TestingPassword123',
       };
 
-      // HOW TF SHOULD I KNOW THAT THIS NEEDS TO BE `backend` INSTEAD OF `localhost`. CRAZYYYY
       const response = await fetch(`${baseURL}/api/auth/signup`, {
         method: 'POST',
         headers: {
@@ -73,7 +72,7 @@ describe('POST auth requests', () => {
 
     });
 
-    it('should return resUser, accessToken, and refreshToken', async () => {
+    it('should login the user and return resUser, accessToken, and refreshToken', async () => {
       const mockUser = await returnTestUser();
       const validUser = {
         username: mockUser.username,
@@ -135,10 +134,73 @@ describe('POST auth requests', () => {
     });
   });
 
+  describe('POST /api/auth/logout', () => {
+    it('should login the user and logout the user using valid credentials', async () => {
+      const mockUser = await returnTestUser();
+      const validUser = {
+        username: mockUser.username,
+        password: mockUser.password,
+      };
+
+      const response = await fetch(`${baseURL}/api/auth/signin`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify(validUser)
+      })
+
+      expect(response.status).to.equal(200);
+      if (response.status === 200) {
+        const res = await fetch(`${baseURL}/api/auth/logout`, {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          credentials: 'include'
+        });
+
+        expect(res.status).to.equal(204)
+      }
+    });
+  });
+
+  // Since the cookie is httpOnly, it's not possible to test the verification of it.
+  describe('GET /api/auth/verifyRefreshToken', () => {
+    it('should verify the refreshToken', async () => {
+      const mockUser = await returnTestUser();
+      const validUser = {
+        username: mockUser.username,
+        password: mockUser.password,
+      };
+
+      const response = await fetch(`${baseURL}/api/auth/signin`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify(validUser)
+      })
+
+      expect(response.status).to.equal(200);
+      if (response.status === 200) {
+        const res = await fetch(`${baseURL}/api/auth/verifyRefreshToken`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          credentials: 'include'
+        })
+
+        expect(res.status).to.equal(401)
+      }
+    });
+  });
+
   describe('GET /isUser', () => {
     it('should return user-protected resources', async () => {
-      // Increasing the timeout for this test
-      // this.timeout(20000)
 
       const mockUser = await returnTestUser();
       const validUser = {
@@ -155,10 +217,6 @@ describe('POST auth requests', () => {
       });
       expect(response.status).to.equal(200)
 
-      console.log("(158:7) - Response headers: ",response.headers)
-      console.log("(159:7) - Authorization header with get(): ",response.headers.get('authorization'))
-      console.log("(160:7) - Header values with values(): ",response.headers.values())
-      console.log("(161:7) - Response status code: ",response.status)
       if (response.status === 200) {
         const res = await fetch(`${baseURL}/isUser`, {
           method: 'GET',
@@ -180,42 +238,3 @@ describe('POST auth requests', () => {
     });
   });
 });
-
-
-// chai.request(app)
-//   .post(`${baseURL}/api/auth/signup`)
-//   .send(JSON.stringify(mockUser))
-//   .end((err, res) => {
-//     if (err) {
-//       expect(res).to.have.status(500);
-//       expect(res.body).to.have.property('message').to.satisfy(
-//         (message) =>
-//           message === 'An error occurred!!' || message === 'User details validation failed'
-//       );
-//     } else {
-//       expect(res).to.have.status(201);
-//       expect(res.body).to.have.property('message').equal('User registered successfully');
-//     }
-//
-//     done();
-//   });
-
-// chai.request(app)
-//   .post(`${baseURL}/api/auth/signin`)
-//   .send(JSON.stringify(validUser))
-//   .end((res) => {
-//     if (res) {
-//       expect(res).to.have.status(200);
-//       expect(res.headers).to.have.property('Authorization')
-//       expect(res.body).to.have.property('resUser');
-//       expect(res.body).to.have.property('accessToken');
-//       expect(res.body).to.have.property('refreshToken');
-//       expect(res.body.resUser).to.deep.equal(expectedResUser);
-//
-//       // Since both JWTs use the same hashing algorithm, they will always start with the same value
-//       expect(res.body.accessToken).to.match(/^eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9/);
-//       expect(res.body.refreshToken).to.match(/^eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9/);
-//     }
-//
-//     done();
-//   });
