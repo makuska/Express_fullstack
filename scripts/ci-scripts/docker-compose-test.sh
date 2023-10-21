@@ -3,7 +3,7 @@
 set -e
 
 # Set the duration for the while loops
-duration=100
+duration=300
 # Start time
 end=$((SECONDS+duration))
 
