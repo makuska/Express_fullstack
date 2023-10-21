@@ -9,7 +9,8 @@ end=$((SECONDS+duration))
 
 # Start Docker Compose
 echo "---Building and starting up docker---"
-CI=true docker compose up --build -d
+# The --abort-on-container-exit option will stop all containers if any container was stopped
+docker compose -f docker-compose.test.yml up --build --abort-on-container-exit
 
 # Function to check whether the backend is up and running
 check_backend_log_message() {

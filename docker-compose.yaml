@@ -6,7 +6,7 @@ version: "3.8"
 services:
   # name is optional for our mongodb
   mymongodb:
-    # since mongo is an offical image we can use it.
+    # since mongo is an official image we can use it.
     image: "mongo"
 
     # the port that we want to publish for mongodb
@@ -34,32 +34,6 @@ services:
     # depends_on means it will start our backend container once mongo-container is  up and running.
     depends_on:
       - mymongodb
-
-  #  In a typical Docker Compose setup, containers can communicate with each other using service names or container names.
-  #  Using localhost to reference another service running in a separate container won't work because each container
-  #  has its own network stack, and localhost refers to the network stack of the container itself.
-  #
-  #  If you want to access the backend service from the backend-tests container using a name like localhost,
-  #  you can't do this directly. However, you can modify your test configuration to use the service name,
-  #  which is how containers in the same network communicate with each other.
-  backend-tests:
-      build: ./backend
-      command:
-        # if `docker compose` cmd has `CI` variable set to `true`, it'll run this container, otherwise it'll ignore it.
-        - /bin/sh
-        - -c
-        - |
-          if [ "$CI" = "true" ]; then
-            ls -R __tests__
-            npm run test
-          else
-            echo "Tests skipped in non-CI environment."
-          fi
-      working_dir: /app
-      depends_on:
-        - mymongodb
-        - backend
-
 
   # name is optional for our frontend
   frontend:
