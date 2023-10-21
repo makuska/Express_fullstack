@@ -12,6 +12,8 @@ services:
       MONGO_INITDB_ROOT_PASSWORD: "pass123"
 
   backend:
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     build: ./backend
     ports:
       - "8080:8080"
@@ -19,6 +21,8 @@ services:
       - mymongodb
 
   backend-tests:
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     build: ./backend
     command:
       - /bin/sh
