@@ -32,5 +32,5 @@ jobs:
           chmod +x scripts/ci-scripts/docker-compose-test.sh
           ./scripts/ci-scripts/docker-compose-test.sh
 
-      - name: Compose down the running containers
-        run: docker compose down
+#      - name: Compose down the running containers
+#        run: docker compose down

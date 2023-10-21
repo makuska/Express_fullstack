@@ -3,13 +3,12 @@
 set -e
 
 # Set the duration for the while loops
-duration=200
+duration=150
 # Start time
 end=$((SECONDS+duration))
 
 # Start Docker Compose
 echo "---Building and starting up docker---"
-# The --abort-on-container-exit option will stop all containers if any container was stopped
 docker compose -f docker-compose.test.yml up --build --abort-on-container-exit
 
 # Function to check whether the backend is up and running
@@ -18,16 +17,17 @@ check_backend_log_message() {
 }
 
 # Wait for the backend to be up and running
-while [[ -z "$(check_backend_log_message)" && $SECONDS -lt $end ]]; do
+while [[ $SECONDS -lt $end ]]; do
+  if [[ -n "$(check_backend_log_message)" ]]; then
+    echo "Backend container up and running"
+    break
+  fi
   sleep 2
 done
 
-status=$?
-if [ $status -eq 0 ]; then
-    echo "Backend container up and running"
-else
-    echo "Unable to start the backend container"
-    exit $status
+if [[ -z "$(check_backend_log_message)" ]]; then
+  echo "Unable to start the backend container"
+  exit 1
 fi
 
 # Function to check whether all containers are up and running
@@ -42,16 +42,18 @@ duration2=30
 end=$((SECONDS+duration2))
 
 # Wait for all containers to be up and running
-while [[ "$(count_running_containers)" -lt "$expected_containers" && $SECONDS -lt $end ]]; do
+while [[ $SECONDS -lt $end ]]; do
+  if [[ "$(count_running_containers)" -eq "$expected_containers" ]]; then
+    echo "All containers up and running"
+    break
+  fi
   sleep 2
 done
 
-status=$?
-if [ $status -eq 0 ]; then
-    echo "All containers up and running"
-else
-    echo "Docker compose had one or more failing containers"
-    exit $status
+if [[ "$(count_running_containers)" -ne "$expected_containers" ]]; then
+  echo "Docker compose had one or more failing containers"
+  exit 1
 fi
 
 echo "---Everything worked, have a nice day :)---"
+docker compose down
