@@ -19,6 +19,12 @@ services:
       - "8080:8080"
     depends_on:
       - mymongodb
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/api/healthCheck", "||", "exit 1"]
+      interval: 20s #specifies the seconds to initially wait before executing the health check and for the subsequent checks
+      timeout: 5s
+      retries: 3
+      start_period: 25s #health checks with an exit code greater than zero won’t mark the container as unhealthy; however, a status code of 0 will mark the container as healthy.
 
   backend-tests:
     extra_hosts:

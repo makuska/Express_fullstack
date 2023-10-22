@@ -6,18 +6,14 @@ log_file="scripts/ci-scripts/docker_compose_logs.txt"
 # Function to collect Docker Compose logs and perform cleanup
 cleanup() {
   echo "---Collecting Docker Compose logs---"
-#  docker logs express_fullstack-frontend-1 >> "$log_file" 2>&1
-#  docker logs express_fullstack-backend-tests-1 >> "$log_file" 2>&1
-#  docker logs express_fullstack-backend-1 >> "$log_file" 2>&1
-#  docker logs express_fullstack-mymongodb-1 >> "$log_file" 2>&1
   {
     docker logs express_fullstack-frontend-1
-    docker logs express_fullstack-backend-tests-1
     docker logs express_fullstack-backend-1
+    docker logs express_fullstack-backend-tests-1
     docker logs express_fullstack-mymongodb-1
   } >> "$log_file" 2>&1
   echo "---Running 'docker compose down'---"
-  docker compose -f docker-compose.test.yml down >> "$log_file" 2>&1
+  docker compose -f docker-compose.test.yml down
 }
 
 # Trap errors/exit and runs the cleanup func

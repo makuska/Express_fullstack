@@ -174,21 +174,4 @@ docker_mongo_react_express-mymongodb-1      | 2023-10-22T10:52:44.840226756Z {"t
 docker_mongo_react_express-mymongodb-1      | 2023-10-22T10:52:44.958859145Z {"t":{"$date":"2023-10-22T10:52:44.957+00:00"},"s":"I",  "c":"-",        "id":20883,   "ctx":"conn1","msg":"Interrupted operation as its client disconnected","attr":{"opId":36}}
 docker_mongo_react_express-mymongodb-1      | 2023-10-22T10:52:44.959955505Z {"t":{"$date":"2023-10-22T10:52:44.959+00:00"},"s":"I",  "c":"NETWORK",  "id":22944,   "ctx":"conn2","msg":"Connection ended","attr":{"remote":"172.21.0.1:54018","uuid":{"uuid":{"$uuid":"30f2a9ae-c113-45ae-8bcc-7f3a87a0f372"}},"connectionId":2,"connectionCount":1}}
 docker_mongo_react_express-mymongodb-1      | 2023-10-22T10:52:44.989003523Z {"t":{"$date":"2023-10-22T10:52:44.988+00:00"},"s":"I",  "c":"NETWORK",  "id":22944,   "ctx":"conn1","msg":"Connection ended","attr":{"remote":"172.21.0.1:54014","uuid":{"uuid":{"$uuid":"4f175290-dd59-43f9-a6c1-0a80d7768a0d"}},"connectionId":1,"connectionCount":0}}
- Container docker_mongo_react_express-backend-tests-1  Stopping
- Container docker_mongo_react_express-frontend-1  Stopping
- Container docker_mongo_react_express-backend-tests-1  Stopped
- Container docker_mongo_react_express-backend-tests-1  Removing
- Container docker_mongo_react_express-backend-tests-1  Removed
- Container docker_mongo_react_express-frontend-1  Stopped
- Container docker_mongo_react_express-frontend-1  Removing
- Container docker_mongo_react_express-frontend-1  Removed
- Container docker_mongo_react_express-backend-1  Stopping
- Container docker_mongo_react_express-backend-1  Stopped
- Container docker_mongo_react_express-backend-1  Removing
- Container docker_mongo_react_express-backend-1  Removed
- Container docker_mongo_react_express-mymongodb-1  Stopping
- Container docker_mongo_react_express-mymongodb-1  Stopped
- Container docker_mongo_react_express-mymongodb-1  Removing
- Container docker_mongo_react_express-mymongodb-1  Removed
- Network docker_mongo_react_express_default  Removing
- Network docker_mongo_react_express_default  Removed
+
