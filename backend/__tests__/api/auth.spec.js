@@ -40,7 +40,7 @@ describe('POST auth requests', () => {
   }
 
   describe("POST /api/auth/signup", () => {
-    it('should insert a user into collection', async () => {
+    it('should register a new user and return 201', async () => {
       const mockUser = {
         username: 'testUsername',
         email: 'test@email.com',
@@ -48,13 +48,15 @@ describe('POST auth requests', () => {
         password: '@TestingPassword123',
       };
 
+      console.log("(50:7) - Request body from first unit test",mockUser)
       const response = await fetch(`${baseURL}/api/auth/signup`, {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
         },
-        body: JSON.stringify(mockUser)
-      });
+        body: JSON.stringify(mockUser),
+      })
+      console.log("(57:7) - Response body from first unit test",response.body)
 
       expect(response.status).to.equal(201)
 
