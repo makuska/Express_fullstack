@@ -4,6 +4,7 @@ import cookieParser from 'cookie-parser'
 
 // Routes
 import authRoute from "./routes/auth.router.js";
+import serverUtilsRouter from "./routes/server-utils.router.js";
 // Swagger
 import swaggerUi from 'swagger-ui-express';
 import swaggerSpec from './config/swagger-config.js';
@@ -29,6 +30,7 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec)); //currently
 
 // Routing
 app.use(authRoute)
+app.use(serverUtilsRouter)
 
 // listens on port {process.env.BACKEND_PORT} for connections
 app.listen(process.env.BACKEND_PORT, () => {

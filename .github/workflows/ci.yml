@@ -18,6 +18,7 @@ jobs:
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
     env:
+      # Downgrade to Docker Compose V1, since there is a bug where `docker compose` commands are not captured (issue 9104)
       COMPOSE_DOCKER_CLI_BUILD: 0
       DOCKER_SCAN_SUGGEST: false
 
