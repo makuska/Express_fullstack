@@ -10,6 +10,8 @@ services:
     environment:
       MONGO_INITDB_ROOT_USERNAME: "root"
       MONGO_INITDB_ROOT_PASSWORD: "pass123"
+    #healthcheck:
+      #test: ["CMD", "echo", "docker compose is retarded"]
 
   backend:
     extra_hosts:
@@ -19,27 +21,38 @@ services:
       - "8080:8080"
     depends_on:
       - mymongodb
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8080/api/healthCheck", "||", "exit 1"]
-      interval: 20s #specifies the seconds to initially wait before executing the health check and for the subsequent checks
-      timeout: 5s
-      retries: 3
-      start_period: 25s #health checks with an exit code greater than zero won’t mark the container as unhealthy; however, a status code of 0 will mark the container as healthy.
+    #healthcheck:
+      #test: ["CMD", "curl", "-f", "http://backend:8080/api/healthCheck", "||", "exit 1"]
+      #interval: 20s #specifies the seconds to initially wait before executing the health check and for the subsequent checks
+      #timeout: 5s
+      #retries: 3
+      #start_period: 25s #health checks with an exit code greater than zero won’t mark the container as unhealthy; however, a status code of 0 will mark the container as healthy.
 
   backend-tests:
     extra_hosts:
       - "host.docker.internal:host-gateway"
     build: ./backend
     command:
-      - /bin/sh
+      # https://stackoverflow.com/a/59072727
+      - /bin/bash
       - -c
       - |
-        ls -R __tests__
-        npm run test
+        while [[ "$(curl --connect-timeout 2 -s -o /dev/null -w ''%{http_code}'' http://backend:8080/api/healthCheck)" != "200" ]]; do 
+          echo "Waiting for backend to be healthy... Sleep 5"; 
+          sleep 5; 
+        done; 
+        sleep 10;
+        echo "Backend is healthy, running tests...";
+        ls -R __tests__;
+        npm run test;
     working_dir: /app
     depends_on:
-      - mymongodb
+      #mymongodb:
+        #condition: service_healthy
+      #backend:
+        #condition: service_healthy
       - backend
+      - mymongodb
 
   frontend:
     build: ./frontend
