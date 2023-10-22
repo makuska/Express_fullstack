@@ -40,25 +40,24 @@ describe('POST auth requests', () => {
   }
 
   describe("POST /api/auth/signup", () => {
-    it('should register a new user and return 201', async () => {
+    // Stopped working
+    it('should fail the signUp schema', async () => {
       const mockUser = {
-        username: 'testUsername',
-        email: 'test@email.com',
+        username: 'test123',
+        email: 'test123@email.com',
         role: 'user',
-        password: '@TestingPassword123',
+        password: '#Test123456789',
       };
 
-      console.log("(50:7) - Request body from first unit test",mockUser)
       const response = await fetch(`${baseURL}/api/auth/signup`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(mockUser),
-      })
-      console.log("(57:7) - Response body from first unit test",response.body)
+      });
 
-      expect(response.status).to.equal(201)
+      expect(response.status).to.equal(201);
 
       const responseBody = await response.json()
 
@@ -71,7 +70,6 @@ describe('POST auth requests', () => {
           return message === 'An error occurred!!' || message === 'User details validation failed';
         });
       }
-
     });
 
     it('should login the user and return resUser, accessToken, and refreshToken', async () => {

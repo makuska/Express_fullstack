@@ -6,12 +6,7 @@ log_file="scripts/ci-scripts/docker_compose_logs.txt"
 # Function to collect Docker Compose logs and perform cleanup
 cleanup() {
   echo "---Collecting Docker Compose logs---"
-  {
-    docker logs express_fullstack-frontend-1
-    docker logs express_fullstack-backend-1
-    docker logs express_fullstack-backend-tests-1
-    docker logs express_fullstack-mymongodb-1
-  } >> "$log_file" 2>&1
+  docker compose -f docker-compose.test.yml logs -t --no-color > "$log_file" 2>&1
   echo "---Running 'docker compose down'---"
   docker compose -f docker-compose.test.yml down
 }
@@ -48,9 +43,9 @@ if [[ $ss -ne 0 ]]; then
   exit "$ss"
 fi
 
-echo "Waiting for backend tests to run"
-
 docker ps -a
+
+echo "Waiting for backend tests to run"
 
 # Check the exit code of the test container
 check_test_container_exit_code() {
