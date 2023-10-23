@@ -6,7 +6,13 @@ log_file="scripts/ci-scripts/docker_compose_logs.txt"
 # Function to collect Docker Compose logs and perform cleanup
 cleanup() {
   echo "---Collecting Docker Compose logs---"
-  docker compose -f docker-compose.test.yml logs -t --no-color > "$log_file" 2>&1
+  #  docker compose -f docker-compose.test.yml logs -t --no-color > "$log_file" 2>&1
+  {
+    docker logs express_fullstack-frontend-1 -t
+    docker logs express_fullstack-backend-1 -t
+    docker logs express_fullstack-backend-tests-1 -t
+    docker logs express_fullstack-mymongodb-1 -t
+  } > "$log_file" 2>&1
   echo "---Running 'docker compose down'---"
   docker compose -f docker-compose.test.yml down
 }
@@ -49,8 +55,18 @@ echo "Waiting for backend tests to run"
 
 # Check the exit code of the test container
 check_test_container_exit_code() {
-  # if all tests passed, then mocha will exit with a code 0, otherwise 1
-  docker wait docker_mongo_react_express-backend-tests-1
+#  local container_name
+#  if [ -n "$GITHUB_ACTIONS" ]; then
+#    # Running in GitHub Actions
+#    container_name="express_fullstack-backend-tests-1"
+#  else
+#    # Running locally
+#    container_name="docker_mongo_react_express-backend-tests-1"
+#  fi
+#
+#  # Wait for the container to exit
+#  docker wait "$container_name"
+  docker wait express_fullstack-backend-tests-1
 }
 
 # Check the exit code of the test container
@@ -60,7 +76,7 @@ echo "exit code for backend-tests: $exit_code"
 if [[ $exit_code -eq 0 ]]; then
   echo "All backend mocha tests passed!"
 else
-  echo "Backend mocha had one or more failing tests"
+  echo "Backend mocha had $exit_code failing tests"
   echo "Check log file ($log_file) for more information!"
   exit "$exit_code"
 fi
