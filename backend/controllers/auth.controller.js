@@ -50,11 +50,9 @@ export async function signup(req, res) {
         password: bcrypt.hashSync(req.body.password, 12),
     }
 
-    console.log("(53:5) - User inside the signup controller: ",user)
     try {
         const result = await db.collection('User').insertOne(user);
 
-        console.log("(57:9) - Result from the database insertion: ",result)
         // insertOne returns an acknowledgement and the _id value of the newly inserted document - so we can use the id field as an additional check
         if (result && result.insertedId) {
             res.status(201).send({ message: "User registered successfully" });

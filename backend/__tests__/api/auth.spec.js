@@ -11,14 +11,29 @@ describe('POST auth requests', () => {
   const baseURL = 'http://backend:8080';
   const startTime = new ObjectId();
 
-  async function cleanUpDatabase() {
+  async function cleanUpDatabaseAfter() {
     await db.collection('User').deleteMany({ _id: { $gt: startTime } });
   }
 
+  async function cleanUpDatabaseBefore() {
+    await db.collection('User').deleteMany({
+      username: {
+        $in: ["testUsername", "testUsername1"]
+      }
+    })
+  }
+
+  before(async () => {
+    // TODO add these usernames to the blacklist! (emails as well...)
+    await cleanUpDatabaseBefore()
+    await new Promise(resolve => setTimeout(resolve, 1000));
+  });
+
+  // If the container is exited unnaturally then it might not delete the records.
   after(async () => {
     // Timeout of 1 second just in case
     await new Promise(resolve => setTimeout(resolve, 1000));
-    await cleanUpDatabase();
+    await cleanUpDatabaseAfter();
     console.log("Test data cleared from the Database");
   });
 
@@ -31,33 +46,41 @@ describe('POST auth requests', () => {
       password: '@TestingPassword123',
     };
 
-    const result = await db.collection('User').insertOne(mockUser);
-    if (result.insertedId) {
+    // Check if the user already exists
+    const existingUser = await db.collection('User').findOne({username: mockUser.username});
+
+    if (existingUser) {
       return mockUser;
     } else {
-      throw new Error("Unable to insert a test user to the database!");
+      // If the user does not exist, insert a new user
+      const result = await db.collection('User').insertOne(mockUser);
+      if (result.insertedId) {
+        return mockUser;
+      } else {
+        throw new Error("Unable to insert a test user to the database!");
+      }
     }
   }
 
+
   describe("POST /api/auth/signup", () => {
-    // Stopped working
-    it('should fail the signUp schema', async () => {
+    it('should insert a user into collection', async () => {
       const mockUser = {
-        username: 'test123',
-        email: 'test123@email.com',
+        username: 'testUsername',
+        email: 'test@email.com',
         role: 'user',
-        password: '#Test123456789',
+        password: '@TestingPassword123',
       };
 
       const response = await fetch(`${baseURL}/api/auth/signup`, {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
+          'Content-Type': 'application/json'
         },
-        body: JSON.stringify(mockUser),
+        body: JSON.stringify(mockUser)
       });
 
-      expect(response.status).to.equal(201);
+      expect(response.status).to.equal(201)
 
       const responseBody = await response.json()
 
@@ -70,6 +93,7 @@ describe('POST auth requests', () => {
           return message === 'An error occurred!!' || message === 'User details validation failed';
         });
       }
+
     });
 
     it('should login the user and return resUser, accessToken, and refreshToken', async () => {
@@ -238,3 +262,58 @@ describe('POST auth requests', () => {
     });
   });
 });
+
+// const userCollectionName = 'users'
+
+/*
+const mockUser = {
+  username: 'testUsername',
+  email: 'test@email.com',
+  role: 'user',
+  password: '@TestingPassword123',
+};
+
+async function cleanUpDatabase() {
+  await db.collection('User').deleteMany({ _id: { $gt: startTime } });
+}
+
+// async function cleanUpDatabaseBefore() {
+//   await db.collection('User').deleteMany({
+//     username: {
+//       $in: ["testUsername", "testUsername1"]
+//     }
+//   })
+// }
+
+before(async () => {
+  // TODO add these usernames to the blacklist! (emails as well...)
+  // await cleanUpDatabaseBefore()
+
+  // Insert test user to the database
+  const result = await db.collection('User').insertOne(mockUser);
+  if (result.insertedId) {
+    console.log("Test user inserted to the database successfully")
+  } else {
+    throw new Error("Unable to insert a test user to the database!");
+  }
+  await new Promise(resolve => setTimeout(resolve, 3000));
+});
+
+after(async () => {
+  // Timeout of 1 second just in case
+  await new Promise(resolve => setTimeout(resolve, 1000));
+  await cleanUpDatabase();
+  console.log("Test data cleared from the Database");
+});
+
+// // TODO I'm such a retard..., all this doesn't make any sense lol. Creates multiple same uses ffs.
+// // Insert a test user, which will be used for testing
+// async function returnTestUser() {
+//   const user = await db.collection('User').findOne({username: 'testUsername'})
+//   if (user) return user
+//   else {
+//     console.error("Unable to fetch the test user!")
+//     throw Error("============Tests using the test user from the database will fail!============")
+//   }
+// }
+*/
