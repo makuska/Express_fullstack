@@ -16,6 +16,7 @@ describe('POST auth requests', () => {
   }
 
   async function cleanUpDatabaseBefore() {
+    // TODO add these usernames to the blacklist! (emails as well...)
     await db.collection('User').deleteMany({
       username: {
         $in: ["testUsername", "testUsername1"]
@@ -24,7 +25,6 @@ describe('POST auth requests', () => {
   }
 
   before(async () => {
-    // TODO add these usernames to the blacklist! (emails as well...)
     await cleanUpDatabaseBefore()
     await new Promise(resolve => setTimeout(resolve, 1000));
   });
@@ -55,6 +55,7 @@ describe('POST auth requests', () => {
       // If the user does not exist, insert a new user
       const result = await db.collection('User').insertOne(mockUser);
       if (result.insertedId) {
+        // Returning mockUser because db user has hashed password
         return mockUser;
       } else {
         throw new Error("Unable to insert a test user to the database!");
