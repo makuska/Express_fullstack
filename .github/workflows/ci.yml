@@ -38,7 +38,8 @@ jobs:
 
       - name: Upload log file
         uses: actions/upload-artifact@v3
+        # Uploads the artifact even if the build fails
         if: always()
         with:
           name: docker-compose-logs
-          path: scripts/ci-scripts/docker_compose_logs.txt
+          path: scripts/ci-scripts/docker_compose_logs.log
