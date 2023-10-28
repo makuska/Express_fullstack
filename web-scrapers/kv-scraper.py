@@ -1,8 +1,35 @@
+# https://realpython.com/beautiful-soup-web-scraper-python/
 from utils.requests_utils import check_whether_website_can_be_scraped
 from bs4 import BeautifulSoup as bs
 import requests
-import lxml
-import re
+
+html = '''
+<article class="default object-type-apartment" data-object-id="3583472" data-object-url="/uurile-anda-2-toaline-korter-pindala-45-m2-6s-korr-3583472.html">
+    <div class="media">
+        <div class="images swiper swiper-initialized swiper-horizontal" data-swiper-pagination="" data-swiper-element="a">
+            <div class="swiper-wrapper" id="swiper-wrapper-06df1873dd51df1f" aria-live="polite" style="transform: translate3d(0px, 0px, 0px);">
+                <div class="swiper-slide swiper-slide-active" style="width: 372px;" role="group" aria-label="1 / 3"><a data-key="8cb14a4e7a1" href="/uurile-anda-2-toaline-korter-pindala-45-m2-6s-korr-3583472.html" data-skeleton="object"> <img src="https://kv.img-bcg.eu/image/object/34/5637/115525637.jpg" loading="lazy" alt=""> </a></div>
+                <div class="swiper-slide" style="width: 372px;" role="group" aria-label="2 / 3"><a data-key="8cb14a4e7a3" href="/uurile-anda-2-toaline-korter-pindala-45-m2-6s-korr-3583472.html" data-skeleton="object"> <img src="https://kv.img-bcg.eu/image/object/34/5640/115525640.jpg" loading="lazy" alt=""> </a></div>
+                <div class="swiper-slide" role="group" aria-label="3 / 3" style="width: 372px;"><a data-key="8cb14a4e7a17" href="/uurile-anda-2-toaline-korter-pindala-45-m2-6s-korr-3583472.html" data-skeleton="object"> <img src="https://kv.img-bcg.eu/image/object/34/5657/115525657.jpg" loading="lazy" alt=""> </a></div>
+            </div>
+            <div class="swiper-button-next" tabindex="0" role="button" aria-label="Next slide" aria-controls="swiper-wrapper-06df1873dd51df1f" aria-disabled="false"></div>
+            <div class="swiper-button-prev swiper-button-disabled" tabindex="-1" role="button" aria-label="Previous slide" aria-controls="swiper-wrapper-06df1873dd51df1f" aria-disabled="true"></div>
+            <div class="swiper-pagination swiper-pagination-fraction swiper-pagination-horizontal"><span class="swiper-pagination-current">1</span> / <span class="swiper-pagination-total">17</span></div>
+            <span class="swiper-notification" aria-live="assertive" aria-atomic="true"></span>
+        </div>
+    </div>
+    <div class="actions"> <a data-key="8cb143ed1218" onclick="KV.favorite(3583472, 'object')" title="Lisa lemmikuks"><i class="icon icon-heart"></i></a> <a data-key="8cb14b7bff19" href="/object/images/3583472" data-target="gallery" title="Galerii"><i class="icon icon-camera"></i></a> </div>
+    <div class="description">
+        <h2> <a data-key="8cb14a4e7a20" href="/uurile-anda-2-toaline-korter-pindala-45-m2-6s-korr-3583472.html" data-skeleton="object"> Tallinn, Kesklinn, Kreutzwaldi 19 </a> </h2>
+        <p class="object-excerpt"> Korrus 6/6, kivimaja, ehitusaasta 1932, valmis, elektripliit, boiler, dušš, keskküte, ... </p>
+        <p class="object-excerpt"> Üürile anda 2 toaline korter, pindala 45 m2, 6-s korrus, lift. Ajalooline kivimaja ... </p>
+    </div>
+    <div class="rooms"> 2 </div>
+    <div class="area"> 45&nbsp;m² </div>
+    <div class="add-time"> </div>
+    <div class="price"> 400&nbsp;€ <small> 8.89 €/m² </small> </div>
+</article>
+'''
 
 city_names: dict[str, str] = {
     "Haabersti": "1001",
@@ -100,7 +127,9 @@ def find_investments(base_url: str) -> [{}]:
 
     website = requests.get(formatted_url, headers=header)
 
-    soup = bs(website.content, 'lxml')
+    # soup = bs(website.content, 'lxml')
+    # THIS IS FOR TESTING ONLY!
+    soup = bs(html, 'html.parser')
 
     results = soup.find_all('article', class_="default object-type-apartment")
 

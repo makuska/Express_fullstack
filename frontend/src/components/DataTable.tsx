@@ -7,6 +7,34 @@ function DataTableComponent() {
     const [filterValue, setFilterValue] = useState<string>('');
     const [isDataLoaded, setIsDataLoaded] = useState<boolean>(false);
 
+    // const websocket = new WebSocket('ws://scrapers:8001')
+    // websocket.onmessage = function(event) {
+    //     const data = JSON.parse(event.data);
+    //     console.log(data);
+    // }
+
+    function handleWebsocket() {
+        const websocket = new WebSocket('ws://localhost:8001')
+        websocket.addEventListener('open', (event) => {
+            console.log('WebSocket connection established:', event);
+
+            // Send a message/signal, which currently triggers the sample_scraper.py task
+            websocket.send('Hello, server!');
+        })
+
+        websocket.addEventListener('message', (event) => {
+            const message = event.data;
+            console.log('Message received from server:', message);
+
+            // futher handle the received data
+        })
+
+        websocket.addEventListener('error', (event) => {
+            // listen for errors and console error them
+            console.error('WebSocket error:', event);
+        })
+    }
+
     useEffect(() => {
         async function fetchData(): Promise<void> {
             const response: Response = await fetch('https://dummyjson.com/users?limit=29');
@@ -51,6 +79,7 @@ function DataTableComponent() {
 
     return (
         <div className="data-table">
+            <button onClick={handleWebsocket} className="input-button">Test Websocket</button>
             <div className="input-container">
                 <input
                     type="text"
