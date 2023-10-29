@@ -334,6 +334,15 @@ table {
     outline: none;
     box-shadow: 0 0 5px rgba(0, 123, 255, 0.7);
   }
+
+  &:disabled {
+    cursor: not-allowed;
+
+    &:hover, &:focus {
+      background-color: #007bff; // Reset background color
+      box-shadow: none; // Remove box shadow
+    }
+  }
 }
 
 
