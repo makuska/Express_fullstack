@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import {useState, useEffect} from 'react';
 
 function DataTableComponent() {
     const [data, setData] = useState<[]>([]);
@@ -6,32 +6,38 @@ function DataTableComponent() {
     const [sortDirection, setSortDirection] = useState<string>('asc');
     const [filterValue, setFilterValue] = useState<string>('');
     const [isDataLoaded, setIsDataLoaded] = useState<boolean>(false);
-
-    // const websocket = new WebSocket('ws://scrapers:8001')
-    // websocket.onmessage = function(event) {
-    //     const data = JSON.parse(event.data);
-    //     console.log(data);
-    // }
+    const [isWebsocketButtonDisabled, setIsWebsocketButtonDisabled] = useState<boolean>(false)
 
     function handleWebsocket() {
+        setIsWebsocketButtonDisabled(true)
+
         const websocket = new WebSocket('ws://localhost:8001')
-        websocket.addEventListener('open', (event) => {
-            console.log('WebSocket connection established:', event);
-
-            // Send a message/signal, which currently triggers the sample_scraper.py task
-            websocket.send('Hello, server!');
+        websocket.addEventListener('open', (event: Event) => {
+            console.log('WebSocket connection established:', event)
+            websocket.send("Requesting web scraper data")
         })
 
-        websocket.addEventListener('message', (event) => {
-            const message = event.data;
-            console.log('Message received from server:', message);
-
-            // futher handle the received data
+         websocket.addEventListener('message', async (event: MessageEvent<any>) => {
+            console.log(event.data);
+            // TODO this should close only if the server fails to, so timeout maybe?
+            // websocket.close(1000, "Work complete, connection closed")
         })
 
-        websocket.addEventListener('error', (event) => {
-            // listen for errors and console error them
+        websocket.addEventListener('close', (event: CloseEvent) => {
+            if (event.wasClean) {
+                console.log(`[close] Connection closed cleanly, code=${event.code} reason=${event.reason}`);
+                console.log("Connection event: ", event)
+            } else {
+                // e.g. server process killed or network down
+                // event.code is usually 1006 in this case
+                console.log('[close] Connection died, event:', event);
+            }
+            setIsWebsocketButtonDisabled(false)
+        })
+
+        websocket.addEventListener('error', (event: Event) => {
             console.error('WebSocket error:', event);
+            setIsWebsocketButtonDisabled(false)
         })
     }
 
@@ -79,7 +85,11 @@ function DataTableComponent() {
 
     return (
         <div className="data-table">
-            <button onClick={handleWebsocket} className="input-button">Test Websocket</button>
+            <button
+                disabled={isWebsocketButtonDisabled}
+                onClick={handleWebsocket}
+                className="input-button"
+            >Test Websocket</button>
             <div className="input-container">
                 <input
                     type="text"
