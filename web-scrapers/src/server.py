@@ -2,8 +2,8 @@ import asyncio
 import websockets
 import logging
 import custom_logger
-from websocket_manager import ws_manager
-from sample_scraper import find_quotes
+from ws.websocket_manager import ws_manager
+from scrapers.sample_scraper import find_quotes
 
 # logger = logging.getLogger()
 # logger.setLevel(logging.INFO)

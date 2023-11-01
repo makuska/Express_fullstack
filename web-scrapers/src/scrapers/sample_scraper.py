@@ -6,9 +6,9 @@ from bs4 import BeautifulSoup as bs
 from requests import RequestException
 from websockets import ConnectionClosedError
 
-from requests_utils import check_whether_website_can_be_scraped
+from utils.requests_utils import check_whether_website_can_be_scraped
 from scraping_errors import WebsiteScrapingError
-from websocket_manager import ws_manager
+from ws.websocket_manager import ws_manager
 
 log = logging.getLogger('root')
 log.setLevel('DEBUG')
